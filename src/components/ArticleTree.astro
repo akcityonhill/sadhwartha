@@ -1,0 +1,161 @@
+---
+import { getCollection } from 'astro:content';
+
+const allArticles = await getCollection('blog');
+
+const sorted = allArticles.sort((a, b) =>
+  b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const grouped = sorted.reduce((acc, article) => {
+  const date = new Date(article.data.pubDate);
+  const year = date.getFullYear();
+  const month = date.toLocaleDateString('en-IN', { month: 'long' });
+  const key = `${year}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+  if (!acc[year]) acc[year] = {};
+  if (!acc[year][key]) acc[year][key] = { month, articles: [] };
+  acc[year][key].articles.push(article);
+
+  return acc;
+}, {});
+
+const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
+
+const currentPath = Astro.url.pathname;
+---
+
+<div class="tree-pane">
+  <div class="tree-heading">Articles</div>
+
+  {years.map((year) => (
+    <div class="tree-year-group">
+      <div class="tree-year">{year}</div>
+
+      {Object.keys(grouped[year])
+        .sort((a, b) => b.localeCompare(a))
+        .map((key) => {
+          const { month, articles } = grouped[year][key];
+          return (
+            <div class="tree-month-group">
+              <div class="tree-month">
+                <span class="tree-line">└──</span>
+                {month}
+              </div>
+              {articles.map((article) => {
+                const href = `/blog/${article.slug}`;
+                const isActive = currentPath === href;
+                return (
+                  
+                        href={href}
+                        class={isActive ? 'tree-article active' : 'tree-article'}
+                    <span class="tree-line-indent">└──</span>
+                    <span class="tree-article-title">{article.data.title}</span>
+                    {article.data.language && (
+                      <span class="tree-lang">{article.data.language}</span>
+                    )}
+                  </a>
+                );
+              })}
+            </div>
+          );
+        })}
+    </div>
+  ))}
+</div>
+
+<style>
+  .tree-pane {
+    background: #ffffff;
+    border: 0.5px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    position: sticky;
+    top: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+  .tree-heading {
+    background: #1e293b;
+    color: #f59e0b;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    padding: 10px 16px;
+    position: sticky;
+    top: 0;
+  }
+  .tree-year-group {
+    border-bottom: 0.5px solid #f1f5f9;
+    padding-bottom: 4px;
+  }
+  .tree-year-group:last-child { border-bottom: none; }
+  .tree-year {
+    font-size: 12px;
+    font-weight: 500;
+    color: #1e293b;
+    padding: 10px 16px 4px;
+    letter-spacing: 0.06em;
+  }
+  .tree-month-group {
+    padding-bottom: 4px;
+  }
+  .tree-month {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 16px;
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+  }
+  .tree-line {
+    font-family: monospace;
+    font-size: 11px;
+    color: #cbd5e1;
+  }
+  .tree-article {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 5px 16px 5px 20px;
+    text-decoration: none;
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.4;
+    border-left: 2px solid transparent;
+    transition: background 0.15s;
+  }
+  .tree-article:hover {
+    background: #fefce8;
+    color: #1e293b;
+    border-left-color: #f59e0b;
+  }
+  .tree-article.active {
+    background: #fefce8;
+    color: #1e293b;
+    border-left-color: #f59e0b;
+    font-weight: 500;
+  }
+  .tree-line-indent {
+    font-family: monospace;
+    font-size: 11px;
+    color: #e2e8f0;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .tree-article-title {
+    flex: 1;
+  }
+  .tree-lang {
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 10px;
+    background: #fef3c7;
+    color: #92400e;
+    border: 0.5px solid #f59e0b;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+</style>

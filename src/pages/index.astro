@@ -1,49 +1,499 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { getCollection } from 'astro:content';
+
+const allArticles = await getCollection('blog');
+const sorted = allArticles.sort((a, b) =>
+  b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const recentArticles = sorted.slice(0, 4);
+
+const grouped = sorted.reduce((acc, article) => {
+  const date = new Date(article.data.pubDate);
+  const year = date.getFullYear();
+  const month = date.toLocaleDateString('en-IN', { month: 'long' });
+  const key = `${year}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+  if (!acc[year]) acc[year] = {};
+  if (!acc[year][key]) acc[year][key] = { month, articles: [] };
+  acc[year][key].articles.push(article);
+  return acc;
+}, {});
+
+const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <body>
+
+    <nav class="navbar">
+      <a href="/" class="nav-brand">SADHWARTHA</a>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/blog" class="nav-link">Articles</a>
+        <a href="/archive" class="nav-link">Archive</a>
+        <a href="/news" class="nav-link">News</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/contact" class="nav-link">Contact</a>
+      </div>
+    </nav>
+
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-name">SADHWARTHA</div>
+    <div class="hero-divider"></div>
+    <div class="hero-sub">
+      An official publication of<br />
+      <strong>Church of God (Full Gospel) in India</strong><br />
+      Central West Region
+    </div>
+  </div>
+</div>
+
+<div class="body-wrap">
+
+      <div class="tree-col">
+        <div class="tree-pane">
+          <div class="tree-header">ALL ARTICLES</div>
+          <div class="tree-body">
+            {years.map((year) => (
+              <div class="tree-year-group">
+                <div class="tree-year">{year}</div>
+                {Object.keys(grouped[year])
+                  .sort((a, b) => b.localeCompare(a))
+                  .map((key) => {
+                    const { month, articles } = grouped[year][key];
+                    return (
+                      <div class="tree-month-group">
+                        <div class="tree-month">
+                          <span class="tline">└─</span> {month}
+                        </div>
+                        {articles.map((article) => (
+                          <a href={`/blog/${article.slug}`} class="tree-article">
+                            <span class="tline-indent">└─</span>
+                            <span class="tree-article-title">{article.data.title}</span>
+                          </a>
+                        ))}
+                      </div>
+                    );
+                  })}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div class="articles-col">
+        <div class="section-label">RECENT ARTICLES</div>
+
+        {recentArticles.map((article) => (
+          <div class="article-card">
+            <div class="article-top">
+              <div class="article-title">{article.data.title}</div>
+              {article.data.language && (
+                <span class="lang-badge">{article.data.language}</span>
+              )}
+            </div>
+            <div class="article-date">
+              {article.data.pubDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </div>
+            <div class="article-desc">{article.data.description}</div>
+            <a href={`/blog/${article.slug ?? article.id}`} class="read-btn">Read article</a>
+          </div>
+        ))}
+      </div>
+
+      <div class="news-col">
+        <div class="news-pane">
+          <div class="news-header">LATEST NEWS</div>
+          <div class="news-body">
+            <div class="news-item">
+              <div class="news-title-row">
+                <span class="news-dot"></span>
+                <span class="news-title">Easter Sunday Service</span>
+              </div>
+              <div class="news-date">31 March 2024</div>
+              <div class="news-desc">Join us for a special Easter Sunday celebration at 9am. All are welcome.</div>
+            </div>
+            <div class="news-item">
+              <div class="news-title-row">
+                <span class="news-dot"></span>
+                <span class="news-title">Good Friday Prayer Meeting</span>
+              </div>
+              <div class="news-date">29 March 2024</div>
+              <div class="news-desc">Evening prayer and worship from 6pm to 8pm.</div>
+            </div>
+            <div class="news-item">
+              <div class="news-title-row">
+                <span class="news-dot"></span>
+                <span class="news-title">April Articles Published</span>
+              </div>
+              <div class="news-date">1 April 2024</div>
+              <div class="news-desc">April articles now available in English, Hindi and Malayalam.</div>
+            </div>
+          </div>
+          <a href="/news" class="news-footer">View all news →</a>
+        </div>
+      </div>
+
+    </div>
+
+    <footer class="footer">
+      <div>
+        <div class="footer-brand">SADHWARTHA</div>
+        <div class="footer-sub">Church of God (Full Gospel) in India, Central West Region</div>
+      </div>
+      <div class="footer-links">
+        <a href="/blog" class="footer-link">Articles</a>
+        <a href="/archive" class="footer-link">Archive</a>
+        <a href="/contact" class="footer-link">Contact</a>
+      </div>
+    </footer>
+
+  </body>
 </html>
+
+<style>
+  body {
+    background: #f1f5f9;
+    font-family: system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 0 1rem;
+  }
+
+  /* NAV */
+  .navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: #1e293b;
+    border-radius: 12px;
+    margin: 1rem auto;
+    max-width: 1100px;
+  }
+  .nav-brand {
+    font-size: 16px;
+    font-weight: 500;
+    color: #f59e0b;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 20px; }
+  .nav-link {
+    font-size: 13px;
+    color: #94a3b8;
+    text-decoration: none;
+  }
+  .nav-link:hover { color: #f59e0b; }
+
+  /* HERO */
+  .hero {
+    border-radius: 12px;
+    margin: 0 auto 1rem;
+    max-width: 1100px;
+    overflow: hidden;
+    position: relative;
+    height: 200px;
+    background:
+      linear-gradient(
+        to right,
+        #1e293b 45%,
+        rgba(30, 41, 59, 0.7) 65%,
+        rgba(30, 41, 59, 0) 100%
+      ),
+      url('/images/hero.jpg') center center / cover no-repeat;
+  }
+  .hero-content {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 55%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 36px;
+  }
+  .hero-name {
+    font-size: 30px;
+    font-weight: 500;
+    color: #f59e0b;
+    letter-spacing: 0.14em;
+    margin-bottom: 10px;
+  }
+  .hero-divider {
+    width: 40px;
+    height: 1.5px;
+    background: #f59e0b;
+    margin-bottom: 10px;
+    opacity: 0.6;
+  }
+  .hero-sub {
+    font-size: 12px;
+    color: #94a3b8;
+    line-height: 1.8;
+  }
+  .hero-sub strong { color: #cbd5e1; font-weight: 500; }
+
+  @media (max-width: 768px) {
+    .hero { height: auto; background: #1e293b; }
+    .hero-content { position: relative; width: 100%; padding: 24px 20px; }
+  }
+
+  /* BODY */
+  .body-wrap {
+    display: grid;
+    grid-template-columns: 220px 1fr 280px;
+    gap: 1rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ARTICLES */
+  .section-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: #1e293b;
+  letter-spacing: 0.12em;
+  margin-bottom: 10px;
+  background: #f59e0b;
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  }
+  .article-card {
+    background: #ffffff;
+    border: 0.5px solid #e2e8f0;
+    border-left: 3px solid #f59e0b;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .article-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .article-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1e293b;
+  }
+  .lang-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #fef3c7;
+    color: #92400e;
+    border: 0.5px solid #f59e0b;
+    white-space: nowrap;
+    margin-left: 8px;
+  }
+  .article-date {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-bottom: 6px;
+  }
+  .article-desc {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+  .read-btn {
+    font-size: 11px;
+    color: #1e293b;
+    border: 0.5px solid #1e293b;
+    border-radius: 8px;
+    padding: 4px 12px;
+    display: inline-block;
+    text-decoration: none;
+  }
+  .read-btn:hover {
+    background: #1e293b;
+    color: #f59e0b;
+  }
+
+  /* NEWS */
+  .news-pane {
+    background: #ffffff;
+    border: 0.5px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .news-header {
+    background: #1e293b;
+    padding: 10px 16px;
+    font-size: 10px;
+    font-weight: 500;
+    color: #f59e0b;
+    letter-spacing: 0.12em;
+  }
+  .news-item {
+    padding: 12px 16px;
+    border-bottom: 0.5px solid #f1f5f9;
+  }
+  .news-item:last-child { border-bottom: none; }
+  .news-title-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3px;
+  }
+  .news-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: #f59e0b;
+    border-radius: 50%;
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+  .news-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #1e293b;
+  }
+  .news-date {
+    font-size: 10px;
+    color: #94a3b8;
+    margin-bottom: 4px;
+    padding-left: 12px;
+  }
+  .news-desc {
+    font-size: 11px;
+    color: #64748b;
+    line-height: 1.5;
+    padding-left: 12px;
+  }
+  .news-footer {
+    display: block;
+    padding: 10px 16px;
+    border-top: 0.5px solid #f1f5f9;
+    font-size: 11px;
+    color: #f59e0b;
+    text-align: center;
+    text-decoration: none;
+  }
+  .news-footer:hover { background: #f8fafc; }
+
+  /* FOOTER */
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 16px 24px;
+    margin: 1.5rem auto 1rem;
+    max-width: 1100px;
+  }
+  .footer-brand {
+    font-size: 13px;
+    font-weight: 500;
+    color: #f59e0b;
+    letter-spacing: 0.08em;
+  }
+  .footer-sub {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+  .footer-links { display: flex; gap: 16px; }
+  .footer-link {
+    font-size: 11px;
+    color: #64748b;
+    text-decoration: none;
+  }
+  .footer-link:hover { color: #f59e0b; }
+  
+  /* TREE PANE */
+  .tree-pane {
+    background: #ffffff;
+    border: 0.5px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    position: sticky;
+    top: 1rem;
+  }
+  .tree-header {
+    background: #1e293b;
+    padding: 10px 14px;
+    font-size: 10px;
+    font-weight: 500;
+    color: #f59e0b;
+    letter-spacing: 0.12em;
+  }
+  .tree-body {
+    padding: 8px 0;
+  }
+  .tree-year-group {
+    margin-bottom: 4px;
+  }
+  .tree-year {
+    font-size: 12px;
+    font-weight: 500;
+    color: #1e293b;
+    padding: 6px 14px;
+    background: #f8fafc;
+    border-bottom: 0.5px solid #f1f5f9;
+  }
+  .tree-month-group {
+    padding: 2px 0;
+  }
+  .tree-month {
+    font-size: 11px;
+    color: #64748b;
+    padding: 4px 14px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .tline {
+    font-family: monospace;
+    color: #cbd5e1;
+    font-size: 11px;
+  }
+  .tline-indent {
+    font-family: monospace;
+    color: #e2e8f0;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+  .tree-article {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 4px 14px 4px 20px;
+    text-decoration: none;
+    font-size: 11px;
+    color: #64748b;
+    line-height: 1.4;
+    border-bottom: 0.5px solid #f8fafc;
+  }
+  .tree-article:hover { background: #fefce8; }
+  .tree-article:hover .tree-article-title { color: #f59e0b; }
+  .tree-article-title {
+    color: #475569;
+    font-size: 11px;
+  }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    .body-wrap { grid-template-columns: 1fr; }
+    .tree-col { display: none; }
+    .nav-links { gap: 12px; flex-wrap: wrap; }
+    .hero-name { font-size: 26px; }
+    .footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
+  /* MOBILE */
+  @media (max-width: 768px) {
+    .body-wrap { grid-template-columns: 1fr; }
+    .nav-links { gap: 12px; flex-wrap: wrap; }
+    .hero-name { font-size: 26px; }
+    .footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>

@@ -1,0 +1,235 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import { SITE_TITLE } from '../consts';
+
+const archive = [
+  {
+    year: 2026,
+    months: [
+      { name: 'January', file: '/archive/2026/January.pdf' },
+    ]
+  },
+  {
+    year: 2025,
+    months: [
+      { name: 'October', file: '/archive/2025/October.pdf' },
+    ]
+  },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={`Archive | ${SITE_TITLE}`} description="Archive of past Sadhwartha publications" />
+  </head>
+  <body>
+
+    <nav class="navbar">
+      <a href="/" class="nav-brand">SADHWARTHA</a>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/blog" class="nav-link">Articles</a>
+        <a href="/archive" class="nav-link active">Archive</a>
+        <a href="/news" class="nav-link">News</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/contact" class="nav-link">Contact</a>
+      </div>
+    </nav>
+
+    <div class="page-wrap">
+
+      <div class="page-header">
+        <div class="page-title">Archive</div>
+        <div class="page-sub">Past publications available as PDF downloads</div>
+      </div>
+
+      <div class="archive-wrap">
+        {archive.map((group) => (
+          <div class="year-group">
+            <div class="year-label">{group.year}</div>
+            <div class="month-list">
+              {group.months.map((month) => (
+                <a href={month.file} target="_blank" class="month-row">
+                  <div class="month-left">
+                    <span class="month-icon">↓</span>
+                    <span class="month-name">{month.name} {group.year}</span>
+                  </div>
+                  <span class="pdf-badge">PDF</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+
+    <footer class="footer">
+      <div>
+        <div class="footer-brand">SADHWARTHA</div>
+        <div class="footer-sub">Church of God (Full Gospel) in India, Central West Region</div>
+      </div>
+      <div class="footer-links">
+        <a href="/blog" class="footer-link">Articles</a>
+        <a href="/archive" class="footer-link">Archive</a>
+        <a href="/contact" class="footer-link">Contact</a>
+      </div>
+    </footer>
+
+  </body>
+</html>
+
+<style>
+  body {
+    background: #f1f5f9;
+    font-family: system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 0 1rem;
+  }
+
+  /* NAV */
+  .navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: #1e293b;
+    border-radius: 12px;
+    margin: 1rem auto;
+    max-width: 1100px;
+  }
+  .nav-brand {
+    font-size: 16px;
+    font-weight: 500;
+    color: #f59e0b;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 20px; }
+  .nav-link {
+    font-size: 13px;
+    color: #94a3b8;
+    text-decoration: none;
+  }
+  .nav-link:hover, .nav-link.active { color: #f59e0b; }
+
+  /* PAGE */
+  .page-wrap {
+    max-width: 720px;
+    margin: 0 auto 2rem;
+  }
+  .page-header {
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 1.5rem;
+  }
+  .page-title {
+    font-size: 26px;
+    font-weight: 500;
+    color: #f59e0b;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .page-sub {
+    font-size: 13px;
+    color: #94a3b8;
+  }
+
+  /* ARCHIVE */
+  .archive-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .year-group {
+    background: #ffffff;
+    border: 0.5px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .year-label {
+    background: #1e293b;
+    color: #f59e0b;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 20px;
+    letter-spacing: 0.08em;
+  }
+  .month-list {
+    padding: 8px 0;
+  }
+  .month-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-bottom: 0.5px solid #f1f5f9;
+    text-decoration: none;
+    color: #1e293b;
+    transition: background 0.15s;
+  }
+  .month-row:last-child { border-bottom: none; }
+  .month-row:hover { background: #fefce8; }
+  .month-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .month-icon {
+    font-size: 14px;
+    color: #f59e0b;
+    font-weight: 500;
+  }
+  .month-name {
+    font-size: 14px;
+    color: #1e293b;
+  }
+  .pdf-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #fef3c7;
+    color: #92400e;
+    border: 0.5px solid #f59e0b;
+    font-weight: 500;
+  }
+
+  /* FOOTER */
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 16px 24px;
+    margin: 0 auto 1rem;
+    max-width: 1100px;
+  }
+  .footer-brand {
+    font-size: 13px;
+    font-weight: 500;
+    color: #f59e0b;
+    letter-spacing: 0.08em;
+  }
+  .footer-sub {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+  .footer-links { display: flex; gap: 16px; }
+  .footer-link {
+    font-size: 11px;
+    color: #64748b;
+    text-decoration: none;
+  }
+  .footer-link:hover { color: #f59e0b; }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    .nav-links { gap: 12px; flex-wrap: wrap; }
+    .page-header { padding: 20px; }
+    .footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
