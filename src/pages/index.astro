@@ -43,19 +43,19 @@ const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
       </div>
     </nav>
 
-<div class="hero">
-  <div class="hero-content">
-    <div class="hero-name">SADHWARTHA</div>
-    <div class="hero-divider"></div>
-    <div class="hero-sub">
-      An official publication of<br />
-      <strong>Church of God (Full Gospel) in India</strong><br />
-      Central West Region
+    <div class="hero">
+      <div class="hero-content">
+        <div class="hero-name">SADHWARTHA</div>
+        <div class="hero-divider"></div>
+        <div class="hero-sub">
+          An official publication of<br />
+          <strong>Church of God (Full Gospel) in India</strong><br />
+          Central West Region
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<div class="body-wrap">
+    <div class="body-wrap">
 
       <div class="tree-col">
         <div class="tree-pane">
@@ -74,7 +74,7 @@ const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
                           <span class="tline">└─</span> {month}
                         </div>
                         {articles.map((article) => (
-                          <a href={`/blog/${article.slug}`} class="tree-article">
+                          <a href={`/blog/${article.slug ?? article.id}`} class="tree-article">
                             <span class="tline-indent">└─</span>
                             <span class="tree-article-title">{article.data.title}</span>
                           </a>
@@ -239,11 +239,6 @@ const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
   }
   .hero-sub strong { color: #cbd5e1; font-weight: 500; }
 
-  @media (max-width: 768px) {
-    .hero { height: auto; background: #1e293b; }
-    .hero-content { position: relative; width: 100%; padding: 24px 20px; }
-  }
-
   /* BODY */
   .body-wrap {
     display: grid;
@@ -251,20 +246,23 @@ const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
     gap: 1rem;
     max-width: 1100px;
     margin: 0 auto;
+    margin-top: 1rem;
+  }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: #1e293b;
+    letter-spacing: 0.12em;
+    margin-bottom: 10px;
+    background: #f59e0b;
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 4px;
   }
 
   /* ARTICLES */
-  .section-label {
-  font-size: 10px;
-  font-weight: 500;
-  color: #1e293b;
-  letter-spacing: 0.12em;
-  margin-bottom: 10px;
-  background: #f59e0b;
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 4px;
-  }
   .article-card {
     background: #ffffff;
     border: 0.5px solid #e2e8f0;
@@ -380,36 +378,6 @@ const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
   }
   .news-footer:hover { background: #f8fafc; }
 
-  /* FOOTER */
-  .footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #1e293b;
-    border-radius: 12px;
-    padding: 16px 24px;
-    margin: 1.5rem auto 1rem;
-    max-width: 1100px;
-  }
-  .footer-brand {
-    font-size: 13px;
-    font-weight: 500;
-    color: #f59e0b;
-    letter-spacing: 0.08em;
-  }
-  .footer-sub {
-    font-size: 11px;
-    color: #64748b;
-    margin-top: 2px;
-  }
-  .footer-links { display: flex; gap: 16px; }
-  .footer-link {
-    font-size: 11px;
-    color: #64748b;
-    text-decoration: none;
-  }
-  .footer-link:hover { color: #f59e0b; }
-  
   /* TREE PANE */
   .tree-pane {
     background: #ffffff;
@@ -481,19 +449,62 @@ const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
     font-size: 11px;
   }
 
+  /* FOOTER */
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 16px 24px;
+    margin: 1.5rem auto 1rem;
+    max-width: 1100px;
+  }
+  .footer-brand {
+    font-size: 13px;
+    font-weight: 500;
+    color: #f59e0b;
+    letter-spacing: 0.08em;
+  }
+  .footer-sub {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+  .footer-links { display: flex; gap: 16px; }
+  .footer-link {
+    font-size: 11px;
+    color: #64748b;
+    text-decoration: none;
+  }
+  .footer-link:hover { color: #f59e0b; }
+
   /* MOBILE */
   @media (max-width: 768px) {
     .body-wrap { grid-template-columns: 1fr; }
     .tree-col { display: none; }
     .nav-links { gap: 12px; flex-wrap: wrap; }
-    .hero-name { font-size: 26px; }
     .footer { flex-direction: column; gap: 12px; text-align: center; }
-  }
-  /* MOBILE */
-  @media (max-width: 768px) {
-    .body-wrap { grid-template-columns: 1fr; }
-    .nav-links { gap: 12px; flex-wrap: wrap; }
-    .hero-name { font-size: 26px; }
-    .footer { flex-direction: column; gap: 12px; text-align: center; }
+    .hero {
+      height: 180px;
+      background:
+        linear-gradient(
+          to bottom,
+          #1e293b 40%,
+          rgba(30, 41, 59, 0.6) 70%,
+          rgba(30, 41, 59, 0) 100%
+        ),
+        url('/images/hero.jpg') center center / cover no-repeat;
+    }
+    .hero-content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      padding: 20px;
+    }
+    .hero-name { font-size: 22px; }
+    .hero-sub { font-size: 11px; }
   }
 </style>
