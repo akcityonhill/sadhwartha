@@ -1,8 +1,12 @@
 ---
-title: 'Arise and shine!'
-description: "Arise and shine. It is Time!"
-pubDate: '2026-03-01'
-language: 'English'
+title: Arise and Shine!
+description: Leadership is a calling — discover the five qualities followers seek in every great leader.
+pubDate: 2026-03-01
+language: en
+heroImage: ""
+translations:
+  ml: ""
+  hi: ""
 ---
 
 ## Introduction

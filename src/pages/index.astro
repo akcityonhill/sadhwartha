@@ -1,145 +1,122 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import BaseHead from '../../components/BaseHead.astro';
+import { SITE_TITLE } from '../../consts';
 import { getCollection } from 'astro:content';
 
 const allArticles = await getCollection('blog');
-const sorted = allArticles.sort((a, b) =>
-  b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+
+const sorted = allArticles.sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 
-const recentArticles = sorted.slice(0, 4);
+// Language display config
+const LANGUAGES: Record<string, { label: string; nativeLabel: string }> = {
+  en: { label: 'English',   nativeLabel: 'English'   },
+  ml: { label: 'Malayalam', nativeLabel: 'മലയാളം'   },
+  hi: { label: 'Hindi',     nativeLabel: 'हिंदी'      },
+};
 
+// Group by language
 const grouped = sorted.reduce((acc, article) => {
-  const date = new Date(article.data.pubDate);
-  const year = date.getFullYear();
-  const month = date.toLocaleDateString('en-IN', { month: 'long' });
-  const key = `${year}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-  if (!acc[year]) acc[year] = {};
-  if (!acc[year][key]) acc[year][key] = { month, articles: [] };
-  acc[year][key].articles.push(article);
+  const lang = article.data.language;
+  if (!acc[lang]) acc[lang] = [];
+  acc[lang].push(article);
   return acc;
-}, {});
+}, {} as Record<string, typeof sorted>);
 
-const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
+const langOrder = ['en', 'ml', 'hi'];
+const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <BaseHead title={`Articles | ${SITE_TITLE}`} description="All Sadhwartha articles" />
   </head>
   <body>
 
     <nav class="navbar">
-      <a href="/" class="nav-brand">SADHWARTHA</a>
+      <a href="/" class="nav-brand">
+        <span class="brand-ml">സാദ്ധ്വർത്ഥ</span>
+        <span class="brand-en">SADHWARTHA</span>
+      </a>
       <div class="nav-links">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/blog" class="nav-link">Articles</a>
-        <a href="/archive" class="nav-link">Archive</a>
-        <a href="/news" class="nav-link">News</a>
-        <a href="/about" class="nav-link">About</a>
+        <a href="/"       class="nav-link">Home</a>
+        <a href="/blog"   class="nav-link active">Articles</a>
+        <a href="/news"   class="nav-link">News</a>
+        <a href="/about"  class="nav-link">About</a>
         <a href="/contact" class="nav-link">Contact</a>
       </div>
     </nav>
 
-    <div class="hero">
-      <div class="hero-content">
-        <div class="hero-name">SADHWARTHA</div>
-        <div class="hero-divider"></div>
-        <div class="hero-sub">
-          An official publication of<br />
-          <strong>Church of God (Full Gospel) in India</strong><br />
-          Central West Region
-        </div>
-      </div>
-    </div>
+    <div class="page-wrap">
 
-    <div class="body-wrap">
-
-      <div class="tree-col">
-        <div class="tree-pane">
-          <div class="tree-header">ALL ARTICLES</div>
-          <div class="tree-body">
-            {years.map((year) => (
-              <div class="tree-year-group">
-                <div class="tree-year">{year}</div>
-                {Object.keys(grouped[year])
-                  .sort((a, b) => b.localeCompare(a))
-                  .map((key) => {
-                    const { month, articles } = grouped[year][key];
-                    return (
-                      <div class="tree-month-group">
-                        <div class="tree-month">
-                          <span class="tline">└─</span> {month}
-                        </div>
-                        {articles.map((article) => (
-                          <a href={`/blog/${article.slug ?? article.id}`} class="tree-article">
-                            <span class="tline-indent">└─</span>
-                            <span class="tree-article-title">{article.data.title}</span>
-                          </a>
-                        ))}
-                      </div>
-                    );
-                  })}
-              </div>
-            ))}
-          </div>
-        </div>
+      <div class="page-header">
+        <div class="page-title">Articles</div>
+        <div class="page-sub">Publications in English, Malayalam and Hindi</div>
       </div>
 
-      <div class="articles-col">
-        <div class="section-label">RECENT ARTICLES</div>
-
-        {recentArticles.map((article) => (
-          <div class="article-card">
-            <div class="article-top">
-              <div class="article-title">{article.data.title}</div>
-              {article.data.language && (
-                <span class="lang-badge">{article.data.language}</span>
-              )}
-            </div>
-            <div class="article-date">
-              {article.data.pubDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-            </div>
-            <div class="article-desc">{article.data.description}</div>
-            <a href={`/blog/${article.slug ?? article.id}`} class="read-btn">Read article</a>
-          </div>
+      <!-- Language tabs -->
+      <div class="lang-tabs">
+        {activeLangs.map((lang, i) => (
+          <a href={`#lang-${lang}`} class={`lang-tab ${i === 0 ? 'active' : ''}`}>
+            <span class="tab-native">{LANGUAGES[lang].nativeLabel}</span>
+            <span class="tab-count">{grouped[lang].length}</span>
+          </a>
         ))}
       </div>
 
-      <div class="news-col">
-        <div class="news-pane">
-          <div class="news-header">LATEST NEWS</div>
-          <div class="news-body">
-            <div class="news-item">
-              <div class="news-title-row">
-                <span class="news-dot"></span>
-                <span class="news-title">Easter Sunday Service</span>
-              </div>
-              <div class="news-date">31 March 2024</div>
-              <div class="news-desc">Join us for a special Easter Sunday celebration at 9am. All are welcome.</div>
-            </div>
-            <div class="news-item">
-              <div class="news-title-row">
-                <span class="news-dot"></span>
-                <span class="news-title">Good Friday Prayer Meeting</span>
-              </div>
-              <div class="news-date">29 March 2024</div>
-              <div class="news-desc">Evening prayer and worship from 6pm to 8pm.</div>
-            </div>
-            <div class="news-item">
-              <div class="news-title-row">
-                <span class="news-dot"></span>
-                <span class="news-title">April Articles Published</span>
-              </div>
-              <div class="news-date">1 April 2024</div>
-              <div class="news-desc">April articles now available in English, Hindi and Malayalam.</div>
-            </div>
+      <!-- Articles grouped by language -->
+      {activeLangs.map((lang) => (
+        <div class="lang-section" id={`lang-${lang}`}>
+
+          <div class="lang-header">
+            <span class="lang-native">{LANGUAGES[lang].nativeLabel}</span>
+            {lang !== 'en' && (
+              <span class="lang-english">{LANGUAGES[lang].label}</span>
+            )}
           </div>
-          <a href="/news" class="news-footer">View all news →</a>
+
+          <div class="articles-list">
+            {grouped[lang].map((article) => {
+              // Build the English version URL if translation slug is provided
+              const enSlug = article.data.translations?.en;
+              const enUrl  = enSlug ? `/blog/en/${enSlug}` : null;
+
+              return (
+                <div class="article-card">
+                  <a href={`/blog/${article.id}`} class="article-link">
+                    {article.data.heroImage && (
+                      <img
+                        src={article.data.heroImage.src}
+                        alt={article.data.title}
+                        class="article-thumb"
+                      />
+                    )}
+                    <div class="article-body">
+                      <span class="article-date">
+                        {new Date(article.data.pubDate).toLocaleDateString('en-IN', {
+                          day: 'numeric', month: 'long', year: 'numeric',
+                        })}
+                      </span>
+                      <div class="article-title">{article.data.title}</div>
+                      <div class="article-desc">{article.data.description}</div>
+                    </div>
+                  </a>
+                  {lang !== 'en' && enUrl && (
+                    <div class="en-version-bar">
+                      <a href={enUrl} class="en-version-link">
+                        View English version →
+                      </a>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
         </div>
-      </div>
+      ))}
 
     </div>
 
@@ -149,8 +126,8 @@ const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
         <div class="footer-sub">Church of God (Full Gospel) in India, Central West Region</div>
       </div>
       <div class="footer-links">
-        <a href="/blog" class="footer-link">Articles</a>
-        <a href="/archive" class="footer-link">Archive</a>
+        <a href="/blog"    class="footer-link">Articles</a>
+        <a href="/news"    class="footer-link">News</a>
         <a href="/contact" class="footer-link">Contact</a>
       </div>
     </footer>
@@ -159,6 +136,8 @@ const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
 </html>
 
 <style>
+  * { box-sizing: border-box; }
+
   body {
     background: #f1f5f9;
     font-family: system-ui, -apple-system, sans-serif;
@@ -166,290 +145,218 @@ const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
     padding: 0 1rem;
   }
 
-  /* NAV */
+  /* ── NAVBAR ─────────────────────────────────── */
   .navbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 24px;
-    background: #1e293b;
-    border-radius: 12px;
-    margin: 1rem auto;
+    padding: 12px 24px;
+    background: #fffbf0;
+    border-bottom: 2px solid #f59e0b;
     max-width: 1100px;
+    margin: 0 auto 1.5rem;
+    border-radius: 0 0 12px 12px;
   }
-  .nav-brand {
-    font-size: 16px;
-    font-weight: 500;
-    color: #f59e0b;
-    letter-spacing: 0.1em;
-    text-decoration: none;
-  }
-  .nav-links { display: flex; gap: 20px; }
-  .nav-link {
-    font-size: 13px;
-    color: #94a3b8;
-    text-decoration: none;
-  }
-  .nav-link:hover { color: #f59e0b; }
 
-  /* HERO */
-  .hero {
-    border-radius: 12px;
-    margin: 0 auto 1rem;
-    max-width: 1100px;
-    overflow: hidden;
-    position: relative;
-    height: 200px;
-    background:
-      linear-gradient(
-        to right,
-        #1e293b 45%,
-        rgba(30, 41, 59, 0.7) 65%,
-        rgba(30, 41, 59, 0) 100%
-      ),
-      url('/images/hero.jpg') center center / cover no-repeat;
-  }
-  .hero-content {
-    position: absolute;
-    top: 0; left: 0; bottom: 0;
-    width: 55%;
+  .nav-brand {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding: 0 36px;
-  }
-  .hero-name {
-    font-size: 30px;
-    font-weight: 500;
-    color: #f59e0b;
-    letter-spacing: 0.14em;
-    margin-bottom: 10px;
-  }
-  .hero-divider {
-    width: 40px;
-    height: 1.5px;
-    background: #f59e0b;
-    margin-bottom: 10px;
-    opacity: 0.6;
-  }
-  .hero-sub {
-    font-size: 12px;
-    color: #94a3b8;
-    line-height: 1.8;
-  }
-  .hero-sub strong { color: #cbd5e1; font-weight: 500; }
-
-  /* BODY */
-  .body-wrap {
-    display: grid;
-    grid-template-columns: 220px 1fr 280px;
-    gap: 1rem;
-    max-width: 1100px;
-    margin: 0 auto;
-    margin-top: 1rem;
+    text-decoration: none;
+    line-height: 1.25;
   }
 
-  /* SECTION LABEL */
-  .section-label {
-    font-size: 10px;
-    font-weight: 500;
+  .brand-ml {
+    font-size: 18px;
+    font-weight: 700;
     color: #1e293b;
-    letter-spacing: 0.12em;
-    margin-bottom: 10px;
-    background: #f59e0b;
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 4px;
   }
 
-  /* ARTICLES */
-  .article-card {
-    background: #ffffff;
-    border: 0.5px solid #e2e8f0;
-    border-left: 3px solid #f59e0b;
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin-bottom: 10px;
+  .brand-en {
+    font-size: 10px;
+    font-weight: 600;
+    color: #92400e;
+    letter-spacing: 0.14em;
   }
-  .article-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+
+  .nav-links { display: flex; gap: 20px; }
+
+  .nav-link {
+    font-size: 13px;
+    color: #64748b;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .nav-link:hover, .nav-link.active {
+    color: #d97706;
+    font-weight: 500;
+  }
+
+  /* ── PAGE ────────────────────────────────────── */
+  .page-wrap {
+    max-width: 760px;
+    margin: 0 auto 3rem;
+  }
+
+  .page-header {
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #f59e0b;
     margin-bottom: 4px;
   }
-  .article-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: #1e293b;
-  }
-  .lang-badge {
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 20px;
-    background: #fef3c7;
-    color: #92400e;
-    border: 0.5px solid #f59e0b;
-    white-space: nowrap;
-    margin-left: 8px;
-  }
-  .article-date {
-    font-size: 11px;
+
+  .page-sub {
+    font-size: 13px;
     color: #94a3b8;
-    margin-bottom: 6px;
-  }
-  .article-desc {
-    font-size: 12px;
-    color: #64748b;
-    line-height: 1.6;
-    margin-bottom: 10px;
-  }
-  .read-btn {
-    font-size: 11px;
-    color: #1e293b;
-    border: 0.5px solid #1e293b;
-    border-radius: 8px;
-    padding: 4px 12px;
-    display: inline-block;
-    text-decoration: none;
-  }
-  .read-btn:hover {
-    background: #1e293b;
-    color: #f59e0b;
   }
 
-  /* NEWS */
-  .news-pane {
-    background: #ffffff;
-    border: 0.5px solid #e2e8f0;
+  /* ── LANGUAGE TABS ───────────────────────────── */
+  .lang-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .lang-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1.5px solid #e2e8f0;
+    background: #fff;
+    text-decoration: none;
+    color: #475569;
+    font-size: 13px;
+    transition: all 0.15s;
+  }
+
+  .lang-tab:hover, .lang-tab.active {
+    border-color: #f59e0b;
+    background: #fffbf0;
+    color: #92400e;
+  }
+
+  .tab-count {
+    font-size: 11px;
+    background: #f1f5f9;
+    color: #94a3b8;
+    padding: 1px 6px;
+    border-radius: 10px;
+  }
+
+  /* ── LANGUAGE SECTION ────────────────────────── */
+  .lang-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .lang-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding-bottom: 10px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #f59e0b;
+  }
+
+  .lang-native {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .lang-english {
+    font-size: 12px;
+    color: #94a3b8;
+  }
+
+  /* ── ARTICLE CARDS ───────────────────────────── */
+  .articles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .article-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
     border-radius: 12px;
     overflow: hidden;
+    transition: box-shadow 0.15s;
   }
-  .news-header {
-    background: #1e293b;
-    padding: 10px 16px;
-    font-size: 10px;
-    font-weight: 500;
-    color: #f59e0b;
-    letter-spacing: 0.12em;
+
+  .article-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
   }
-  .news-item {
-    padding: 12px 16px;
-    border-bottom: 0.5px solid #f1f5f9;
-  }
-  .news-item:last-child { border-bottom: none; }
-  .news-title-row {
+
+  .article-link {
     display: flex;
     align-items: center;
-    margin-bottom: 3px;
+    gap: 16px;
+    padding: 16px;
+    text-decoration: none;
+    color: inherit;
   }
-  .news-dot {
-    display: inline-block;
-    width: 6px; height: 6px;
-    background: #f59e0b;
-    border-radius: 50%;
-    margin-right: 6px;
+
+  .article-thumb {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
     flex-shrink: 0;
+    background: #f1f5f9;
   }
-  .news-title {
-    font-size: 12px;
-    font-weight: 500;
-    color: #1e293b;
-  }
-  .news-date {
-    font-size: 10px;
+
+  .article-body { flex: 1; }
+
+  .article-date {
+    display: block;
+    font-size: 11px;
     color: #94a3b8;
     margin-bottom: 4px;
-    padding-left: 12px;
   }
-  .news-desc {
-    font-size: 11px;
+
+  .article-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 4px;
+    line-height: 1.35;
+  }
+
+  .article-card:hover .article-title { color: #d97706; }
+
+  .article-desc {
+    font-size: 13px;
     color: #64748b;
     line-height: 1.5;
-    padding-left: 12px;
   }
-  .news-footer {
-    display: block;
-    padding: 10px 16px;
-    border-top: 0.5px solid #f1f5f9;
-    font-size: 11px;
-    color: #f59e0b;
-    text-align: center;
-    text-decoration: none;
-  }
-  .news-footer:hover { background: #f8fafc; }
 
-  /* TREE PANE */
-  .tree-pane {
-    background: #ffffff;
-    border: 0.5px solid #e2e8f0;
-    border-radius: 12px;
-    overflow: hidden;
-    position: sticky;
-    top: 1rem;
+  /* ── ENGLISH VERSION LINK ────────────────────── */
+  .en-version-bar {
+    border-top: 1px solid #f1f5f9;
+    padding: 8px 16px;
+    background: #fffbf0;
   }
-  .tree-header {
-    background: #1e293b;
-    padding: 10px 14px;
-    font-size: 10px;
-    font-weight: 500;
-    color: #f59e0b;
-    letter-spacing: 0.12em;
-  }
-  .tree-body {
-    padding: 8px 0;
-  }
-  .tree-year-group {
-    margin-bottom: 4px;
-  }
-  .tree-year {
+
+  .en-version-link {
     font-size: 12px;
-    font-weight: 500;
-    color: #1e293b;
-    padding: 6px 14px;
-    background: #f8fafc;
-    border-bottom: 0.5px solid #f1f5f9;
-  }
-  .tree-month-group {
-    padding: 2px 0;
-  }
-  .tree-month {
-    font-size: 11px;
-    color: #64748b;
-    padding: 4px 14px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .tline {
-    font-family: monospace;
-    color: #cbd5e1;
-    font-size: 11px;
-  }
-  .tline-indent {
-    font-family: monospace;
-    color: #e2e8f0;
-    font-size: 11px;
-    flex-shrink: 0;
-  }
-  .tree-article {
-    display: flex;
-    align-items: flex-start;
-    gap: 4px;
-    padding: 4px 14px 4px 20px;
+    color: #d97706;
     text-decoration: none;
-    font-size: 11px;
-    color: #64748b;
-    line-height: 1.4;
-    border-bottom: 0.5px solid #f8fafc;
-  }
-  .tree-article:hover { background: #fefce8; }
-  .tree-article:hover .tree-article-title { color: #f59e0b; }
-  .tree-article-title {
-    color: #475569;
-    font-size: 11px;
+    font-weight: 500;
   }
 
-  /* FOOTER */
+  .en-version-link:hover { text-decoration: underline; }
+
+  /* ── FOOTER ──────────────────────────────────── */
   .footer {
     display: flex;
     align-items: center;
@@ -457,54 +364,39 @@ const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
     background: #1e293b;
     border-radius: 12px;
     padding: 16px 24px;
-    margin: 1.5rem auto 1rem;
     max-width: 1100px;
+    margin: 0 auto 1.5rem;
   }
+
   .footer-brand {
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
     color: #f59e0b;
     letter-spacing: 0.08em;
   }
+
   .footer-sub {
     font-size: 11px;
     color: #64748b;
     margin-top: 2px;
   }
+
   .footer-links { display: flex; gap: 16px; }
+
   .footer-link {
     font-size: 11px;
     color: #64748b;
     text-decoration: none;
   }
+
   .footer-link:hover { color: #f59e0b; }
 
-  /* MOBILE */
-  @media (max-width: 768px) {
-    .body-wrap { grid-template-columns: 1fr; }
-    .tree-col { display: none; }
+  /* ── MOBILE ──────────────────────────────────── */
+  @media (max-width: 640px) {
+    .navbar { padding: 12px 16px; }
     .nav-links { gap: 12px; flex-wrap: wrap; }
+    .page-header { padding: 20px; }
+    .article-link { gap: 12px; }
     .footer { flex-direction: column; gap: 12px; text-align: center; }
-    .hero {
-      height: 180px;
-      background:
-        linear-gradient(
-          to bottom,
-          #1e293b 40%,
-          rgba(30, 41, 59, 0.6) 70%,
-          rgba(30, 41, 59, 0) 100%
-        ),
-        url('/images/hero.jpg') center center / cover no-repeat;
-    }
-    .hero-content {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      width: 100%;
-      padding: 20px;
-    }
-    .hero-name { font-size: 22px; }
-    .hero-sub { font-size: 11px; }
   }
 </style>
