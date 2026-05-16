@@ -1,69 +1,175 @@
 ---
+import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import { SITE_TITLE } from '../consts';
 
-interface Props {
-  title: string;
-  description: string;
-  pubDate: Date;
-  language?: string;
-  heroImage?: string;
-}
+type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, language, heroImage } = Astro.props;
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  heroImage,
+  language,
+  translations,
+} = Astro.props;
 
-const formattedDate = pubDate.toLocaleDateString('en-IN', {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric'
+const LANG_LABELS: Record<string, { label: string; nativeLabel: string }> = {
+  en: { label: 'English',   nativeLabel: 'English' },
+  ml: { label: 'Malayalam', nativeLabel: 'മലയാളം' },
+  hi: { label: 'Hindi',     nativeLabel: 'हिंदी'   },
+};
+
+// Build "View English version" URL if this is a non-English article
+// with a translations.en slug provided
+const enVersionUrl =
+  language !== 'en' && translations?.en
+    ? `/blog/en/${translations.en}`
+    : null;
+
+// Build hreflang alternate URLs for SEO
+const hreflangs: { lang: string; url: string }[] = [];
+if (translations?.en) hreflangs.push({ lang: 'en', url: `/blog/en/${translations.en}` });
+if (translations?.ml) hreflangs.push({ lang: 'ml', url: `/blog/ml/${translations.ml}` });
+if (translations?.hi) hreflangs.push({ lang: 'hi', url: `/blog/hi/${translations.hi}` });
+// Add self
+hreflangs.push({ lang: language, url: Astro.url.pathname });
+
+const formattedDate = new Date(pubDate).toLocaleDateString('en-IN', {
+  day: 'numeric', month: 'long', year: 'numeric',
 });
+const updatedFormatted = updatedDate
+  ? new Date(updatedDate).toLocaleDateString('en-IN', {
+      day: 'numeric', month: 'long', year: 'numeric',
+    })
+  : null;
+
+const pageUrl = Astro.site
+  ? new URL(Astro.url.pathname, Astro.site).href
+  : Astro.url.href;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={language}>
   <head>
-    <BaseHead title={`${title} | ${SITE_TITLE}`} description={description} />
+    <BaseHead title={`${title} | ${SITE_TITLE}`} description={description} image={heroImage?.src} />
+    <!-- hreflang tags for multilingual SEO -->
+    {hreflangs.map(({ lang, url }) => (
+      <link rel="alternate" hreflang={lang} href={new URL(url, Astro.site).href} />
+    ))}
   </head>
+
   <body>
 
     <nav class="navbar">
-      <a href="/" class="nav-brand">SADHWARTHA</a>
+      <a href="/" class="nav-brand">
+        <span class="brand-ml">സാദ്ധ്വർത്ഥ</span>
+        <span class="brand-en">SADHWARTHA</span>
+      </a>
       <div class="nav-links">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/blog" class="nav-link">Articles</a>
-        <a href="/archive" class="nav-link">Archive</a>
-        <a href="/news" class="nav-link">News</a>
-        <a href="/about" class="nav-link">About</a>
+        <a href="/"        class="nav-link">Home</a>
+        <a href="/blog"    class="nav-link active">Articles</a>
+        <a href="/news"    class="nav-link">News</a>
+        <a href="/about"   class="nav-link">About</a>
         <a href="/contact" class="nav-link">Contact</a>
       </div>
     </nav>
 
-    <div class="article-wrap">
+    <article class="article-wrap">
 
-      <div class="article-header">
-        <a href="/blog" class="back-link">← All Articles</a>
-        <div class="article-meta">
-          <span class="article-date">{formattedDate}</span>
-          {language && <span class="lang-badge">{language}</span>}
-        </div>
-        <h1 class="article-title">{title}</h1>
-        <p class="article-description">{description}</p>
-        <div class="header-divider"></div>
-      </div>
-
+      <!-- Hero image -->
       {heroImage && (
-        <img src={heroImage} alt={title} class="hero-image" />
+        <div class="hero-wrap">
+          <img src={heroImage.src} alt={title} class="hero-img" />
+        </div>
       )}
 
-      <div class="article-body">
-        <slot />
-      </div>
+      <div class="article-inner">
 
-      <div class="article-footer">
-        <a href="/blog" class="back-btn">← Back to Articles</a>
-      </div>
+        <!-- Language badge + English version link -->
+        <div class="meta-row">
+          <span class="lang-badge" data-lang={language}>
+            {LANG_LABELS[language]?.nativeLabel ?? language}
+          </span>
+          {enVersionUrl && (
+            <a href={enVersionUrl} class="en-version-link">
+              View English version →
+            </a>
+          )}
+        </div>
 
-    </div>
+        <!-- Title & dates -->
+        <h1 class="article-title">{title}</h1>
+        <div class="date-row">
+          <time datetime={pubDate.toISOString()}>{formattedDate}</time>
+          {updatedFormatted && (
+            <span class="updated-date">Updated: {updatedFormatted}</span>
+          )}
+        </div>
+
+        <!-- Body content -->
+        <div class="prose">
+          <slot />
+        </div>
+
+        <!-- Share bar -->
+        <div class="share-bar">
+          <span class="share-label">Share</span>
+
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(title + ' ' + pageUrl)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="share-btn whatsapp"
+            aria-label="Share on WhatsApp"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+            </svg>
+            WhatsApp
+          </a>
+
+          <a
+            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="share-btn facebook"
+            aria-label="Share on Facebook"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            Facebook
+          </a>
+
+          <button
+            class="share-btn copy"
+            aria-label="Copy link"
+            data-url={pageUrl}
+            onclick="
+              navigator.clipboard.writeText(this.dataset.url).then(() => {
+                const orig = this.innerHTML;
+                this.textContent = 'Copied!';
+                setTimeout(() => { this.innerHTML = orig; }, 2000);
+              });
+            "
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            Copy Link
+          </button>
+        </div>
+
+        <!-- Back link -->
+        <div class="back-row">
+          <a href="/blog" class="back-link">← All Articles</a>
+        </div>
+
+      </div>
+    </article>
 
     <footer class="footer">
       <div>
@@ -71,8 +177,8 @@ const formattedDate = pubDate.toLocaleDateString('en-IN', {
         <div class="footer-sub">Church of God (Full Gospel) in India, Central West Region</div>
       </div>
       <div class="footer-links">
-        <a href="/blog" class="footer-link">Articles</a>
-        <a href="/archive" class="footer-link">Archive</a>
+        <a href="/blog"    class="footer-link">Articles</a>
+        <a href="/news"    class="footer-link">News</a>
         <a href="/contact" class="footer-link">Contact</a>
       </div>
     </footer>
@@ -81,6 +187,8 @@ const formattedDate = pubDate.toLocaleDateString('en-IN', {
 </html>
 
 <style>
+  * { box-sizing: border-box; }
+
   body {
     background: #f1f5f9;
     font-family: system-ui, -apple-system, sans-serif;
@@ -88,169 +196,199 @@ const formattedDate = pubDate.toLocaleDateString('en-IN', {
     padding: 0 1rem;
   }
 
-  /* NAV */
+  /* ── NAVBAR ─────────────────────────────────── */
   .navbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 24px;
-    background: #1e293b;
-    border-radius: 12px;
-    margin: 1rem auto;
+    padding: 12px 24px;
+    background: #fffbf0;
+    border-bottom: 2px solid #f59e0b;
     max-width: 1100px;
+    margin: 0 auto 1.5rem;
+    border-radius: 0 0 12px 12px;
   }
+
   .nav-brand {
-    font-size: 16px;
-    font-weight: 500;
-    color: #f59e0b;
-    letter-spacing: 0.1em;
+    display: flex;
+    flex-direction: column;
     text-decoration: none;
+    line-height: 1.25;
   }
+
+  .brand-ml { font-size: 18px; font-weight: 700; color: #1e293b; }
+  .brand-en { font-size: 10px; font-weight: 600; color: #92400e; letter-spacing: 0.14em; }
+
   .nav-links { display: flex; gap: 20px; }
+
   .nav-link {
+    font-size: 13px;
+    color: #64748b;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .nav-link:hover, .nav-link.active { color: #d97706; font-weight: 500; }
+
+  /* ── ARTICLE ─────────────────────────────────── */
+  .article-wrap {
+    max-width: 720px;
+    margin: 0 auto 3rem;
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+  }
+
+  .hero-wrap { width: 100%; aspect-ratio: 16/7; overflow: hidden; }
+  .hero-img   { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .article-inner { padding: 32px; }
+
+  /* ── META ROW ────────────────────────────────── */
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .lang-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: #fffbf0;
+    color: #92400e;
+    border: 1px solid #fde68a;
+    letter-spacing: 0.04em;
+  }
+
+  .en-version-link {
+    font-size: 12px;
+    color: #d97706;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .en-version-link:hover { text-decoration: underline; }
+
+  /* ── TITLE & DATE ────────────────────────────── */
+  .article-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.3;
+    margin: 0 0 12px;
+  }
+
+  .date-row {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 28px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .updated-date { color: #cbd5e1; }
+
+  /* ── PROSE ───────────────────────────────────── */
+  .prose {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #334155;
+  }
+
+  .prose h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 2rem 0 0.75rem;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #fde68a;
+  }
+
+  .prose h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 1.5rem 0 0.5rem;
+  }
+
+  .prose p { margin: 0 0 1.2rem; }
+
+  .prose blockquote {
+    border-left: 3px solid #f59e0b;
+    margin: 1.5rem 0;
+    padding: 12px 20px;
+    background: #fffbf0;
+    border-radius: 0 8px 8px 0;
+    color: #64748b;
+    font-style: italic;
+  }
+
+  .prose strong { color: #1e293b; }
+
+  .prose a { color: #d97706; }
+
+  .prose hr {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 2rem 0;
+  }
+
+  /* ── SHARE BAR ───────────────────────────────── */
+  .share-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 2.5rem 0 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  .share-label {
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 500;
+    margin-right: 4px;
+  }
+
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .share-btn:hover { opacity: 0.85; }
+
+  .share-btn.whatsapp { background: #25D366; color: #fff; }
+  .share-btn.facebook { background: #1877F2; color: #fff; }
+  .share-btn.copy     { background: #f1f5f9; color: #475569; }
+
+  /* ── BACK LINK ───────────────────────────────── */
+  .back-row { margin-top: 1rem; }
+
+  .back-link {
     font-size: 13px;
     color: #94a3b8;
     text-decoration: none;
   }
-  .nav-link:hover { color: #f59e0b; }
 
-  /* ARTICLE WRAPPER */
-  .article-wrap {
-    max-width: 720px;
-    margin: 0 auto 2rem;
-    background: #ffffff;
-    border-radius: 12px;
-    border: 0.5px solid #e2e8f0;
-    overflow: hidden;
-  }
+  .back-link:hover { color: #d97706; }
 
-  /* ARTICLE HEADER */
-  .article-header {
-    background: #1e293b;
-    padding: 28px 32px 24px;
-  }
-  .back-link {
-    font-size: 12px;
-    color: #94a3b8;
-    text-decoration: none;
-    display: inline-block;
-    margin-bottom: 16px;
-  }
-  .back-link:hover { color: #f59e0b; }
-  .article-meta {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  .article-date {
-    font-size: 12px;
-    color: #94a3b8;
-  }
-  .lang-badge {
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 20px;
-    background: #fef3c7;
-    color: #92400e;
-    border: 0.5px solid #f59e0b;
-  }
-  .article-title {
-    font-size: 26px;
-    font-weight: 500;
-    color: #f59e0b;
-    line-height: 1.3;
-    margin-bottom: 10px;
-  }
-  .article-description {
-    font-size: 14px;
-    color: #94a3b8;
-    line-height: 1.6;
-  }
-  .header-divider {
-    width: 40px;
-    height: 2px;
-    background: #f59e0b;
-    margin-top: 20px;
-    opacity: 0.6;
-  }
-
-  /* HERO IMAGE */
-  .hero-image {
-    width: 100%;
-    max-height: 340px;
-    object-fit: cover;
-  }
-
-  /* ARTICLE BODY */
-  .article-body {
-    padding: 32px;
-    font-size: 16px;
-    color: #334155;
-    line-height: 1.8;
-  }
-  .article-body h2 {
-    font-size: 20px;
-    font-weight: 500;
-    color: #1e293b;
-    margin: 2rem 0 0.75rem;
-    padding-bottom: 6px;
-    border-bottom: 1px solid #f1f5f9;
-  }
-  .article-body h3 {
-    font-size: 17px;
-    font-weight: 500;
-    color: #1e293b;
-    margin: 1.5rem 0 0.5rem;
-  }
-  .article-body p {
-    margin-bottom: 1.2rem;
-  }
-  .article-body blockquote {
-    border-left: 3px solid #f59e0b;
-    margin: 1.5rem 0;
-    padding: 10px 20px;
-    background: #fefce8;
-    border-radius: 0 8px 8px 0;
-    font-style: italic;
-    color: #64748b;
-  }
-  .article-body a {
-    color: #f59e0b;
-    text-decoration: underline;
-  }
-  .article-body ul, .article-body ol {
-    padding-left: 1.5rem;
-    margin-bottom: 1.2rem;
-  }
-  .article-body li {
-    margin-bottom: 0.4rem;
-  }
-  .article-body strong {
-    color: #1e293b;
-    font-weight: 500;
-  }
-
-  /* ARTICLE FOOTER */
-  .article-footer {
-    padding: 20px 32px;
-    border-top: 0.5px solid #f1f5f9;
-  }
-  .back-btn {
-    font-size: 12px;
-    color: #1e293b;
-    border: 0.5px solid #1e293b;
-    border-radius: 8px;
-    padding: 6px 14px;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .back-btn:hover {
-    background: #1e293b;
-    color: #f59e0b;
-  }
-
-  /* FOOTER */
+  /* ── FOOTER ──────────────────────────────────── */
   .footer {
     display: flex;
     align-items: center;
@@ -258,35 +396,23 @@ const formattedDate = pubDate.toLocaleDateString('en-IN', {
     background: #1e293b;
     border-radius: 12px;
     padding: 16px 24px;
-    margin: 0 auto 1rem;
     max-width: 1100px;
+    margin: 0 auto 1.5rem;
   }
-  .footer-brand {
-    font-size: 13px;
-    font-weight: 500;
-    color: #f59e0b;
-    letter-spacing: 0.08em;
-  }
-  .footer-sub {
-    font-size: 11px;
-    color: #64748b;
-    margin-top: 2px;
-  }
+
+  .footer-brand { font-size: 13px; font-weight: 600; color: #f59e0b; letter-spacing: 0.08em; }
+  .footer-sub   { font-size: 11px; color: #64748b; margin-top: 2px; }
   .footer-links { display: flex; gap: 16px; }
-  .footer-link {
-    font-size: 11px;
-    color: #64748b;
-    text-decoration: none;
-  }
+  .footer-link  { font-size: 11px; color: #64748b; text-decoration: none; }
   .footer-link:hover { color: #f59e0b; }
 
-  /* MOBILE */
-  @media (max-width: 768px) {
+  /* ── MOBILE ──────────────────────────────────── */
+  @media (max-width: 640px) {
+    .navbar { padding: 12px 16px; }
     .nav-links { gap: 12px; flex-wrap: wrap; }
-    .article-header { padding: 20px; }
-    .article-body { padding: 20px; }
-    .article-footer { padding: 16px 20px; }
+    .article-inner { padding: 20px; }
     .article-title { font-size: 22px; }
+    .prose { font-size: 15px; }
     .footer { flex-direction: column; gap: 12px; text-align: center; }
   }
 </style>
