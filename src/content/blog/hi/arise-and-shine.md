@@ -3,7 +3,7 @@ title: उठो और चमको!
 description: विश्वास में उठने और हर मौसम में परमेश्वर की महिमा को प्रकाशित करने का आह्वान।
 pubDate: 2026-03-01
 language: hi
-heroImage: ""
+heroImage: ../../../../public/images/arise_and_shine.png
 translations:
   en: arise-and-shine
 ---

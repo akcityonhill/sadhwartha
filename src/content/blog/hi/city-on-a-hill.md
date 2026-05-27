@@ -3,7 +3,7 @@ title: पहाड़ पर नगर
 description: आज की दुनिया में मसीह के लिए एक दृश्यमान गवाह होने के अर्थ पर विचार।
 pubDate: 2026-04-01
 language: hi
-heroImage: ""
+heroImage: ../../../../public/images/city_on_a_hill.png
 translations:
   en: city-on-a-hill
 ---

@@ -3,7 +3,7 @@ title: A City on a Hill
 description: Reflections on what it means to be a visible witness for Christ in the world today.
 pubDate: 2026-04-01
 language: en
-heroImage: ""
+heroImage: ../../../../public/images/city_on_a_hill.png
 translations:
   ml: city-on-a-hill
   hi: city-on-a-hill

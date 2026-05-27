@@ -3,7 +3,7 @@ title: മലമുകളിലെ നഗരം
 description: ഇന്നത്തെ ലോകത്തിൽ ക്രിസ്തുവിന് ദൃശ്യമായ സാക്ഷിയാകുക എന്നതിനെക്കുറിച്ചുള്ള ചിന്തകൾ.
 pubDate: 2026-04-01
 language: ml
-heroImage: ""
+heroImage: ../../../../public/images/city_on_a_hill.png
 translations:
   en: city-on-a-hill
 ---

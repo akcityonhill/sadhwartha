@@ -3,13 +3,13 @@ title: Arise and Shine!
 description: A call to rise in faith and reflect the glory of God in every season of life.
 pubDate: 2026-03-01
 language: en
-heroImage: ""
+heroImage: ../../../../public/images/arise_and_shine.png
 translations:
   ml: arise-and-shine
   hi: arise-and-shine
 ---
 
-The prophet Isaiah declared, *"Arise, shine, for your light has come"* — a command that still echoes across generations.
+The prophet Isaiah declared, _"Arise, shine, for your light has come"_ — a command that still echoes across generations.
 
 God does not call us to rise when conditions are perfect; He calls us to shine precisely in the darkness around us.
 

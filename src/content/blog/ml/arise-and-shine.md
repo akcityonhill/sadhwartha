@@ -3,7 +3,7 @@ title: ഉണർന്നെഴുന്നേൽക്കൂ, പ്രകാ�
 description: വിശ്വാസത്തിൽ ഉണർന്ന് ദൈവ മഹത്വം പ്രകാശിപ്പിക്കാനുള്ള ഒരു ആഹ്വാനം.
 pubDate: 2026-03-01
 language: ml
-heroImage: ""
+heroImage: ../../../../public/images/arise_and_shine.png
 translations:
   en: arise-and-shine
 ---
