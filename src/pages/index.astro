@@ -1,5 +1,7 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { getCollection } from 'astro:content';
 
@@ -9,6 +11,27 @@ const allArticles = await getCollection('blog');
 const recentArticles = allArticles
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 4);
+
+const showWelcomeSlide = false; // Set to true to show
+
+// CAROUSEL: Featured articles & custom slides - EASILY EDITABLE
+// Pick specific articles by their ID (folder/file name)
+// Example IDs: 'en/city-on-a-hill', 'ml/arise-and-shine', etc.
+const carouselSlides = [
+  // Article slides - reference by article ID (folder/filename)
+  { type: 'article', id: 'en/city-on-a-hill' },
+  { type: 'article', id: 'en/arise-and-shine' },
+  // Custom announcement slides
+  { type: 'announcement', title: 'New Publication Released', subtitle: 'Check out our latest edition', language: 'en' },
+];
+
+// Get featured articles
+const featuredArticles = carouselSlides
+  .filter(slide => slide.type === 'article')
+  .map(slide => allArticles.find(a => a.id === slide.id))
+  .filter((article): article is typeof allArticles[0] => Boolean(article));
+
+const customSlides = carouselSlides.filter(slide => slide.type === 'announcement');
 
 const LANG_LABELS: Record<string, string> = {
   en: 'English',
@@ -25,40 +48,66 @@ const LANG_LABELS: Record<string, string> = {
 
   <body>
 
-    <!-- ── NAVBAR ───────────────────────────────── -->
-    <nav class="navbar">
-      <a href="/" class="nav-brand">
-        <span class="brand-ml">സദ്വാർത്ത</span>
-        <span class="brand-en">SADHWARTHA</span>
-      </a>
-      <div class="nav-links">
-        <a href="/"        class="nav-link active">Home</a>
-        <a href="/blog"    class="nav-link">Articles</a>
-        <a href="/news"    class="nav-link">News</a>
-        <a href="/about"   class="nav-link">About</a>
-        <a href="/contact" class="nav-link">Contact</a>
-      </div>
-      <button class="nav-toggle" aria-label="Toggle menu" onclick="
-        document.querySelector('.nav-links').classList.toggle('open');
-      ">☰</button>
-    </nav>
+    <Navbar />
 
-    <!-- ── HERO ─────────────────────────────────── -->
-    <section class="hero">
-      <div class="hero-inner">
-        <div class="hero-tag">Church of God (Full Gospel) in India</div>
-        <h1 class="hero-title">
-          <span class="hero-title-ml">സദ്വാർത്ത</span>
-          <span class="hero-title-en">Sadhwartha</span>
-        </h1>
-        <p class="hero-sub">
-          Proclaiming the Gospel across Central West Region —
-          in English, Malayalam and Hindi.
-        </p>
-        <div class="hero-actions">
-          <a href="/blog" class="btn-primary">Read Articles</a>
-          <a href="/about" class="btn-secondary">About Us</a>
+    <!-- ── CAROUSEL ───────────────────────────────── -->
+    <section class="carousel">
+      <div class="carousel-inner">
+        {showWelcomeSlide && (
+        <!-- Welcome Slide -->
+        <div class="carousel-item carousel-welcome-item">
+          <div class="carousel-welcome">
+            <p class="welcome-sub">Welcome to the official home of</p>
+            <h1 class="welcome-title">
+                  <img src="/sadhwartha_ml.png" alt="സദ്വാർത്ത" />
+              <span class="welcome-en">An official publication of Church of God (Full Gospel) in India, Central West Region</span>
+            </h1>
+          </div>
         </div>
+        )}
+
+        <!-- Featured Articles -->
+        {featuredArticles.map((article) => (
+          <a href={`/blog/${article.id}`} class="carousel-item carousel-article-item">
+            <div class="carousel-img-wrap">
+              {article.data.heroImage
+                ? <img src={article.data.heroImage.src} alt={article.data.title} class="carousel-img" />
+                : <div class="carousel-img-placeholder">✝</div>
+              }
+            </div>
+            <div class="carousel-overlay"></div>
+            <div class="carousel-content">
+              <div class="carousel-meta">
+                <span class="carousel-lang">{LANG_LABELS[article.data.language] ?? article.data.language}</span>
+              </div>
+              <h2 class="carousel-title">{article.data.title}</h2>
+              <p class="carousel-desc">{article.data.description}</p>
+            </div>
+          </a>
+        ))}
+
+        <!-- Custom Announcement Slides -->
+        {customSlides.map((slide) => (
+          <div class="carousel-item carousel-announcement-item">
+            <div class="carousel-overlay"></div>
+            <div class="carousel-content">
+              <h2 class="carousel-title">{slide.title}</h2>
+              <p class="carousel-desc">{slide.subtitle}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Navigation Buttons -->
+      <button class="carousel-btn carousel-btn-prev" aria-label="Previous slide">❮</button>
+      <button class="carousel-btn carousel-btn-next" aria-label="Next slide">❯</button>
+
+      <!-- Dots -->
+      <div class="carousel-dots">
+        {showWelcomeSlide && <button class="dot active" data-slide="0" aria-label="Welcome slide"></button>}
+        {[...Array(featuredArticles.length + customSlides.length)].map((_, index) => (
+          <button class={`dot ${!showWelcomeSlide && index === 0 ? 'active' : ''}`} data-slide={showWelcomeSlide ? index + 1 : index} aria-label={`Slide ${index + (showWelcomeSlide ? 2 : 1)}`}></button>
+        ))}
       </div>
     </section>
 
@@ -127,158 +176,354 @@ const LANG_LABELS: Record<string, string> = {
       </div>
     </section>
 
-    <!-- ── FOOTER ────────────────────────────────── -->
-    <footer class="footer">
-      <div class="footer-inner">
-        <div class="footer-brand-block">
-          <div class="footer-brand-ml">സദ്വാർത്ത</div>
-          <div class="footer-brand-en">SADHWARTHA</div>
-          <div class="footer-tagline">
-            Church of God (Full Gospel) in India<br />Central West Region
-          </div>
-        </div>
-        <div class="footer-links-block">
-          <div class="footer-col">
-            <div class="footer-col-title">Publication</div>
-            <a href="/blog"    class="footer-link">Articles</a>
-            <a href="/news"    class="footer-link">News</a>
-          </div>
-          <div class="footer-col">
-            <div class="footer-col-title">Info</div>
-            <a href="/about"   class="footer-link">About Us</a>
-            <a href="/contact" class="footer-link">Contact</a>
-          </div>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        © {new Date().getFullYear()} Sadhwartha · Church of God (Full Gospel) in India
-      </div>
-    </footer>
+    <Footer />
 
   </body>
 </html>
+
+<script>
+  // Carousel autorotation
+  const carouselInner = document.querySelector('.carousel-inner') as HTMLElement | null;
+  const dots = document.querySelectorAll('.dot');
+  let currentSlide = 0;
+  const totalSlides = dots.length;
+  const rotationInterval = 4000; // 4 seconds
+
+  function goToSlide(n: number): void {
+    if (!carouselInner) return;
+    currentSlide = (n + totalSlides) % totalSlides;
+    carouselInner.style.transform = `translateX(-${currentSlide * 100}%)`;
+    
+    // Update dots
+    dots.forEach((dot, index) => {
+      dot.classList.toggle('active', index === currentSlide);
+    });
+  }
+
+  function nextSlide(): void {
+    goToSlide(currentSlide + 1);
+  }
+
+  // Auto-rotate carousel
+  setInterval(nextSlide, rotationInterval);
+
+  // Dot click handlers
+  dots.forEach((dot) => {
+    dot.addEventListener('click', (e: Event) => {
+      const target = e.target as HTMLElement;
+      goToSlide(parseInt(target.dataset.slide ?? '0'));
+    });
+  });
+
+  // Arrow button handlers
+  const prevBtn = document.querySelector('.carousel-btn-prev') as HTMLElement | null;
+  const nextBtn = document.querySelector('.carousel-btn-next') as HTMLElement | null;
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => nextSlide());
+  }
+
+  // Touch swipe support for mobile
+  let touchStartX = 0;
+  let touchEndX = 0;
+  const swipeThreshold = 50; // Minimum swipe distance in pixels
+  const carousel = document.querySelector('.carousel') as HTMLElement | null;
+
+  if (carousel) {
+    carousel.addEventListener('touchstart', (e: TouchEvent) => {
+      touchStartX = e.changedTouches[0].clientX;
+    }, false);
+
+    carousel.addEventListener('touchend', (e: TouchEvent) => {
+      touchEndX = e.changedTouches[0].clientX;
+      handleSwipe();
+    }, false);
+  }
+
+  function handleSwipe(): void {
+    const swipeDistance = touchStartX - touchEndX;
+    
+    // Swipe left (positive distance) = next slide
+    if (swipeDistance > swipeThreshold) {
+      nextSlide();
+    }
+    // Swipe right (negative distance) = prev slide
+    else if (swipeDistance < -swipeThreshold) {
+      goToSlide(currentSlide - 1);
+    }
+  }
+</script>
 
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: #f1f5f9;
+    background: var(--bg-page);
     font-family: system-ui, -apple-system, sans-serif;
   }
 
-  /* ── NAVBAR ─────────────────────────────────── */
-  .navbar {
+  /* ── CAROUSEL ────────────────────────────────── */
+  .carousel {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+    margin-top: var(--navbar-height);
+    background: linear-gradient(135deg, var(--slate) 0%, #0f172a 60%, #1c1917 100%);
+  }
+
+  .carousel-inner {
+    display: flex;
+    height: 100%;
+    transition: transform 0.6s ease-in-out;
+  }
+
+  .carousel-item {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 12px 32px;
-    background: #fffbf0;
-    border-bottom: 2px solid #f59e0b;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    justify-content: center;
+    position: relative;
   }
 
-  .nav-brand {
-    display: flex;
-    flex-direction: column;
-    text-decoration: none;
-    line-height: 1.25;
+  /* Welcome Slide */
+  .carousel-welcome-item {
+    background: linear-gradient(135deg, var(--slate) 0%, #0f172a 60%, #1c1917 100%);
   }
 
-  .brand-ml { font-size: 20px; font-weight: 700; color: #1e293b; }
-  .brand-en { font-size: 10px; font-weight: 600; color: #92400e; letter-spacing: 0.15em; }
-
-  .nav-links { display: flex; gap: 24px; }
-
-  .nav-link {
-    font-size: 14px;
-    color: #64748b;
-    text-decoration: none;
-    transition: color 0.15s;
-  }
-
-  .nav-link:hover, .nav-link.active {
-    color: #d97706;
-    font-weight: 500;
-  }
-
-  .nav-toggle {
-    display: none;
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    color: #475569;
-  }
-
-  /* ── HERO ────────────────────────────────────── */
-  .hero {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 60%, #1c1917 100%);
-    padding: 72px 32px;
+  .carousel-welcome {
     text-align: center;
-  }
-
-  .hero-inner {
     max-width: 640px;
-    margin: 0 auto;
+    padding: 40px;
   }
 
-  .hero-tag {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 600;
-    color: #f59e0b;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    background: rgba(245, 158, 11, 0.1);
-    border: 1px solid rgba(245, 158, 11, 0.25);
-    padding: 4px 14px;
-    border-radius: 20px;
-    margin-bottom: 20px;
-  }
-
-  .hero-title {
+  .welcome-title {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
     margin-bottom: 16px;
   }
 
-  .hero-title-ml {
-    font-size: 48px;
+  .welcome-ml {
+    font-size: 36px;
     font-weight: 700;
-    color: #fff;
+    color: var(--bg-white);
     line-height: 1.1;
   }
 
-  .hero-title-en {
-    font-size: 16px;
+  .welcome-en {
+    font-size: 12px;
     font-weight: 500;
-    color: #f59e0b;
+    color: var(--red);
     letter-spacing: 0.2em;
     text-transform: uppercase;
   }
 
-  .hero-sub {
-    font-size: 15px;
-    color: #94a3b8;
+  .welcome-sub {
+    font-size: 13px;
+    color: var(--text-muted);
     line-height: 1.7;
-    margin-bottom: 28px;
+    margin-bottom: 10px;
   }
 
-  .hero-actions {
+  .welcome-actions {
+    display: none;
+  }
+
+  /* Article Slides */
+  .carousel-article-item {
+    background: #000;
+    color: var(--bg-white);
+    text-decoration: none;
+  }
+
+  /* Announcement Slides */
+  .carousel-announcement-item {
+    background: linear-gradient(135deg, var(--red) 0%, #b01f1f 100%);
+    color: var(--bg-white);
+  }
+
+  .carousel-img-wrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .carousel-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .carousel-img-placeholder {
+    width: 100%;
+    height: 100%;
     display: flex;
-    gap: 12px;
+    align-items: center;
     justify-content: center;
-    flex-wrap: wrap;
+    font-size: 80px;
+    color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, var(--slate), #0f172a);
+  }
+
+  .carousel-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.2));
+  }
+
+  .carousel-content {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    right: 40px;
+    z-index: 10;
+    max-width: 600px;
+  }
+
+  .carousel-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .carousel-lang {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--bg-white);
+    background: rgba(214, 40, 40, 0.8);
+    padding: 4px 10px;
+    border-radius: 10px;
+  }
+
+  .carousel-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--bg-white);
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+
+  .carousel-desc {
+    font-size: 13px;
+    color: var(--border-light);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Carousel Dots */
+  .carousel-dots {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 20;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .dot.active {
+    background: var(--red);
+  }
+
+  .dot:hover {
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Carousel Navigation Buttons */
+  .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 15;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s, transform 0.2s;
+    opacity: 0.6;
+  }
+
+  .carousel-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    opacity: 1;
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  .carousel-btn:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+
+  .carousel-btn-prev {
+    left: 16px;
+  }
+
+  .carousel-btn-next {
+    right: 16px;
+  }
+
+  /* ── TABLET (768px to 1024px) ────────────────── */
+  @media (max-width: 1024px) {
+    .carousel {
+      height: 350px;
+    }
+
+    .carousel-content {
+      bottom: 30px;
+      left: 30px;
+      right: 30px;
+    }
+
+    .carousel-title {
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    .carousel-desc {
+      font-size: 12px;
+      -webkit-line-clamp: 2;
+    }
   }
 
   .btn-primary {
     padding: 10px 24px;
-    background: #f59e0b;
-    color: #1e293b;
+    background: var(--red);
+    color: var(--bg-white);
     font-weight: 600;
     font-size: 14px;
     border-radius: 8px;
@@ -286,21 +531,21 @@ const LANG_LABELS: Record<string, string> = {
     transition: background 0.15s;
   }
 
-  .btn-primary:hover { background: #d97706; }
+  .btn-primary:hover { background: #b01f1f; }
 
   .btn-secondary {
     padding: 10px 24px;
     background: transparent;
-    color: #cbd5e1;
+    color: var(--border-light);
     font-weight: 500;
     font-size: 14px;
     border-radius: 8px;
-    border: 1px solid #334155;
+    border: 1px solid var(--text-dark);
     text-decoration: none;
     transition: border-color 0.15s, color 0.15s;
   }
 
-  .btn-secondary:hover { border-color: #f59e0b; color: #f59e0b; }
+  .btn-secondary:hover { border-color: var(--red); color: var(--red); }
 
   /* ── SECTIONS ────────────────────────────────── */
   .section { padding: 48px 32px; }
@@ -317,12 +562,12 @@ const LANG_LABELS: Record<string, string> = {
   .section-title {
     font-size: 20px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-primary);
   }
 
   .section-more {
     font-size: 13px;
-    color: #d97706;
+    color: var(--red);
     text-decoration: none;
     font-weight: 500;
   }
@@ -337,8 +582,8 @@ const LANG_LABELS: Record<string, string> = {
   }
 
   .article-card {
-    background: #fff;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-white);
+    border: 1px solid var(--border);
     border-radius: 12px;
     overflow: hidden;
     text-decoration: none;
@@ -357,7 +602,7 @@ const LANG_LABELS: Record<string, string> = {
     width: 100%;
     aspect-ratio: 16/9;
     overflow: hidden;
-    background: #f1f5f9;
+    background: var(--bg-page);
   }
 
   .card-img {
@@ -390,31 +635,31 @@ const LANG_LABELS: Record<string, string> = {
   .card-lang {
     font-size: 10px;
     font-weight: 600;
-    color: #92400e;
-    background: #fffbf0;
-    border: 1px solid #fde68a;
+    color: var(--red);
+    background: var(--orange-light);
+    border: 1px solid var(--red);
     padding: 2px 8px;
     border-radius: 10px;
   }
 
   .card-date {
     font-size: 11px;
-    color: #94a3b8;
+    color: var(--text-muted);
   }
 
   .card-title {
     font-size: 15px;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text-primary);
     line-height: 1.4;
     margin-bottom: 6px;
   }
 
-  .article-card:hover .card-title { color: #d97706; }
+  .article-card:hover .card-title { color: var(--red); }
 
   .card-desc {
     font-size: 12px;
-    color: #64748b;
+    color: var(--text-secondary);
     line-height: 1.5;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -436,8 +681,8 @@ const LANG_LABELS: Record<string, string> = {
   }
 
   .ql-card {
-    background: #fff;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-white);
+    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 20px;
     text-decoration: none;
@@ -446,15 +691,15 @@ const LANG_LABELS: Record<string, string> = {
   }
 
   .ql-card:hover {
-    border-color: #f59e0b;
+    border-color: var(--red);
     background: #fffbf0;
-    box-shadow: 0 4px 12px rgba(245,158,11,0.1);
+    box-shadow: 0 4px 12px rgba(214, 40, 40, 0.1);
   }
 
   .ql-icon {
     font-size: 28px;
     font-weight: 700;
-    color: #f59e0b;
+    color: var(--red);
     margin-bottom: 8px;
     line-height: 1;
   }
@@ -462,93 +707,232 @@ const LANG_LABELS: Record<string, string> = {
   .ql-label {
     font-size: 15px;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text-primary);
     margin-bottom: 4px;
   }
 
   .ql-sub {
     font-size: 11px;
-    color: #94a3b8;
+    color: var(--text-muted);
   }
 
-  /* ── FOOTER ──────────────────────────────────── */
-  .footer {
-    background: #0f172a;
-    padding: 40px 32px 16px;
+  /* ── TABLET (768px to 1024px) ────────────────── */
+  @media (max-width: 1024px) {
+    .carousel {
+      height: 280px;
+    }
+
+    .carousel-content {
+      bottom: 30px;
+      left: 30px;
+      right: 30px;
+    }
+
+    .carousel-title {
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    .carousel-welcome {
+      padding: 30px;
+    }
+
+    .welcome-ml {
+      font-size: 32px;
+    }
+
+    .welcome-en {
+      font-size: 12px;
+    }
+
+    .welcome-sub {
+      font-size: 12px;
+    }
+
+    .carousel-dots {
+      bottom: 12px;
+    }
+
+    .nav-center {
+      gap: 10px;  /* Reduce gap between images */
+    }
+
+    .center-img-ml {
+      height: 24px;  /* Scale down from 32px */
+    }
+
+    .center-img-cog {
+      height: 28px;  /* Scale down from 38px */
+    }
+
+    .center-img-en {
+      height: 18px;  /* Scale down from 24px */
+    }
+
+    .nav-links {
+      gap: 16px;  /* Reduce link spacing */
+    }
+
+    .nav-link {
+      font-size: 13px;  /* Smaller text */
+    }
   }
 
-  .footer-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    gap: 40px;
-    flex-wrap: wrap;
-    padding-bottom: 32px;
-    border-bottom: 1px solid #1e293b;
+  /* ── MOBILE (640px and below) ────────────────── */
+  @media (max-width: 768px) {
+    .carousel {
+      height: 200px;
+    }
+
+    .carousel-content {
+      bottom: 25px;
+      left: 25px;
+      right: 25px;
+      max-width: none;
+    }
+
+    .carousel-title {
+      font-size: 20px;
+      margin-bottom: 5px;
+    }
+
+    .carousel-desc {
+      font-size: 12px;
+      -webkit-line-clamp: 2;
+    }
+
+    .carousel-lang {
+      font-size: 9px;
+      padding: 3px 8px;
+    }
+
+    .carousel-welcome {
+      padding: 25px;
+    }
+
+    .welcome-ml {
+      font-size: 28px;
+    }
+
+    .welcome-en {
+      font-size: 9px;
+    }
+
+    .welcome-sub {
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+
+    .carousel-dots {
+      bottom: 12px;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+    }
   }
 
-  .footer-brand-ml {
-    font-size: 22px;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 2px;
-  }
-
-  .footer-brand-en {
-    font-size: 10px;
-    font-weight: 600;
-    color: #f59e0b;
-    letter-spacing: 0.15em;
-    margin-bottom: 10px;
-  }
-
-  .footer-tagline {
-    font-size: 12px;
-    color: #475569;
-    line-height: 1.6;
-  }
-
-  .footer-links-block {
-    display: flex;
-    gap: 40px;
-  }
-
-  .footer-col {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .footer-col-title {
-    font-size: 11px;
-    font-weight: 600;
-    color: #64748b;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-
-  .footer-link {
-    font-size: 13px;
-    color: #475569;
-    text-decoration: none;
-    transition: color 0.15s;
-  }
-
-  .footer-link:hover { color: #f59e0b; }
-
-  .footer-bottom {
-    max-width: 1100px;
-    margin: 16px auto 0;
-    font-size: 11px;
-    color: #334155;
-    text-align: center;
-  }
-
-  /* ── MOBILE ──────────────────────────────────── */
   @media (max-width: 640px) {
-    .navbar { padding: 12px 16px; }
+    .carousel {
+      height: 175px;
+    }
+
+    .carousel-welcome {
+      padding: 20px;
+    }
+
+    .welcome-title {
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    .welcome-ml {
+      font-size: 24px;
+    }
+
+    .welcome-en {
+      font-size: 10px;
+    }
+
+    .welcome-sub {
+      font-size: 11px;
+      margin-bottom: 12px;
+    }
+
+    .welcome-actions {
+      gap: 8px;
+    }
+
+    .carousel-content {
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+    }
+
+    .carousel-title {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .carousel-desc {
+      font-size: 12px;
+    }
+
+    .carousel-dots {
+      bottom: 9px;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+    }
+
+    .navbar { 
+      padding: 12px 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .nav-left {
+      order: 1;
+      flex: 0 0 auto;
+    }
+
+    .nav-center {
+      order: 3;
+      width: 100%;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .center-img-ml {
+      height: 18px;  /* Scale down further */
+    }
+
+    .center-img-cog {
+      height: 16px;
+    }
+
+    .center-img-en {
+      height: 14px;
+    }
+
+    .nav-right {
+      order: 2;
+      flex: 1;
+      justify-content: flex-end;
+    }
+
+    .nav-logo {
+      flex: 0 0 40px;
+    }
+
+    .logo-img {
+      height: 40px;
+    }
 
     .nav-links {
       display: none;
@@ -567,8 +951,9 @@ const LANG_LABELS: Record<string, string> = {
     .nav-links.open { display: flex; }
     .nav-toggle { display: block; }
 
-    .hero { padding: 48px 20px; }
-    .hero-title-ml { font-size: 36px; }
+    .nav-link {
+      font-size: 14px;
+    }
 
     .section { padding: 32px 16px; }
     .quicklinks { padding: 0 16px 32px; }
