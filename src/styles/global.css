@@ -1,14 +1,24 @@
 :root {
+  /* ── NAVBAR LAYOUT ──────────────────────────────── */
+  --navbar-height: 58px; /* Update this when navbar height changes */
+
+  /* ── PRIMARY PALETTE ────────────────────────────── */
+  --navy: #003049;
+  --red: #d62828;
+  --orange: #f77f00;
+  --orange-light: #fcbf49;
+
+  /* ── SEMANTIC COLORS ────────────────────────────── */
   --slate: #1e293b;
-  --amber: #f59e0b;
-  --amber-light: #fef3c7;
-  --amber-dark: #92400e;
   --text-primary: #1e293b;
   --text-secondary: #64748b;
   --text-muted: #94a3b8;
+  --text-dark: #334155;
   --bg-page: #f1f5f9;
+  --bg-page-alt: #f8fafc;
   --bg-white: #ffffff;
   --border: #e2e8f0;
+  --border-light: #cbd5e1;
 }
 
 * {
@@ -17,8 +27,36 @@
   padding: 0;
 }
 
+html {
+  scroll-padding-top: var(--navbar-height);
+  /* Scrollbar styling for Firefox */
+  scrollbar-color: #cbd5e1 #f1f5f9;
+  scrollbar-width: thin;
+}
+
+/* Scrollbar styling for Chrome, Safari, Edge */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
 body {
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
   background: var(--bg-page);
   color: var(--text-primary);
   line-height: 1.7;
@@ -32,4 +70,11 @@ a {
 img {
   max-width: 100%;
   height: auto;
+}
+
+/* ── MOBILE LAYOUT ────────────────────────────── */
+@media (max-width: 640px) {
+  :root {
+    --navbar-height: 50px; /* Mobile navbar is smaller */
+  }
 }
