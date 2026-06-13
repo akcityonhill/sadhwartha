@@ -3,7 +3,7 @@
   --navbar-height: 58px; /* Update this when navbar height changes */
 
   /* ── PRIMARY PALETTE ────────────────────────────── */
-  --navy: #003049;
+  --navy: #0f172a;
   --red: #d62828;
   --orange: #f77f00;
   --orange-light: #fcbf49;
@@ -19,6 +19,13 @@
   --bg-white: #ffffff;
   --border: #e2e8f0;
   --border-light: #cbd5e1;
+
+  /* ── NAVBAR COLORS ─────────────────────────────── */
+  --nav-link-color: #0f172a;
+  --hamburger-color: #475569;
+  --mobile-menu-bg: #ffffff;
+  --red-hover-light: rgba(214, 40, 40, 0.1);
+  --red-hover-lighter: rgba(214, 40, 40, 0.15);
 }
 
 * {
@@ -60,6 +67,14 @@ body {
   background: var(--bg-page);
   color: var(--text-primary);
   line-height: 1.7;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── FOOTER POSITIONING ─────────────────────────── */
+body > footer {
+  margin-top: auto;
 }
 
 a {
