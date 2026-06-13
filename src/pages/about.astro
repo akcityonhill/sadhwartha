@@ -1,28 +1,28 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Navbar from '../components/Navbar.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE } from '../consts';
+import BaseHead from "../components/BaseHead.astro";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+import { SITE_TITLE } from "../consts";
 
 const pageTitle = `About | ${SITE_TITLE}`;
-const pageDescription = 'Learn about Sadhwartha and meet our office bearers.';
+const pageDescription = "Learn about Sadhwartha and meet our office bearers.";
 
 // Office bearers data - easily updatable
 const officeBearers = [
   {
-    name: 'E. P. Samkutty',
-    position: 'Patron',
-    image: '/images/EPS.jpg',
+    name: "E. P. Samkutty",
+    position: "Patron",
+    image: "/images/EPS.jpg",
   },
   {
-    name: 'Biju Thankachan',
-    position: 'Publication Director',
-    image: '/images/BT.jpg',
+    name: "Biju Thankachan",
+    position: "Publication Director",
+    image: "/images/BT.jpg",
   },
   {
-    name: 'Manu K Chacko',
-    position: 'Chief Editor',
-    image: '/images/MKC.jpg',
+    name: "Manu K Chacko",
+    position: "Chief Editor",
+    image: "/images/MKC.jpg",
   },
 ];
 ---
@@ -34,7 +34,6 @@ const officeBearers = [
   </head>
 
   <body>
-
     <Navbar />
 
     <!-- ── ABOUT CONTENT ─────────────────────────── -->
@@ -43,9 +42,15 @@ const officeBearers = [
         <div class="about-intro">
           <div class="intro-text">
             <p>
-                Established in 1989, Sadhwartha serves as the official voice of the Church of God in India, Central West Region. It was launched with a vision to keep believers informed and connected through regional news.            </p>
+              Established in 1989, Sadhwartha serves as the official voice of
+              the Church of God in India, Central West Region. It was launched
+              with a vision to keep believers informed and connected through
+              regional news.
+            </p>
             <p>
-                Beyond sharing vital updates, Sadhwartha is dedicated to nurturing talent by encouraging and publishing the work of writers both within our region and beyond.            </p>
+              Beyond sharing vital updates, Sadhwartha is dedicated to nurturing
+              talent by encouraging and publishing the work of writers both
+              within our region and beyond.
             </p>
           </div>
         </div>
@@ -57,39 +62,47 @@ const officeBearers = [
       <div class="section-wrap">
         <h2 class="section-heading">Leadership of Sadhwartha Publication</h2>
         <!-- <p class="bearers-subtitle">Leadership of Sadhwartha Publication</p> -->
-        
+
         <div class="bearers-grid">
-          {officeBearers.map((bearer) => (
-            <div class="bearer-card">
-              <div class="bearer-image-wrap">
-                <img 
-                  src={bearer.image} 
-                  alt={bearer.name} 
-                  class="bearer-image"
-                />
+          {
+            officeBearers.map((bearer) => (
+              <div class="bearer-card">
+                <div class="bearer-image-wrap">
+                  <img
+                    src={bearer.image}
+                    alt={bearer.name}
+                    class="bearer-image"
+                  />
+                </div>
+                <div class="bearer-info">
+                  <h3 class="bearer-name">{bearer.name}</h3>
+                  <p class="bearer-position">{bearer.position}</p>
+                </div>
               </div>
-              <div class="bearer-info">
-                <h3 class="bearer-name">{bearer.name}</h3>
-                <p class="bearer-position">{bearer.position}</p>
-              </div>
-            </div>
-          ))}
+            ))
+          }
         </div>
       </div>
     </section>
 
     <!-- ── FOOTER ────────────────────────────────── -->
     <Footer />
-
   </body>
 </html>
 
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
   body {
     background: var(--bg-page);
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family:
+      system-ui,
+      -apple-system,
+      sans-serif;
   }
 
   /* ── ABOUT HERO ────────────────────────────────── */
@@ -141,7 +154,6 @@ const officeBearers = [
     padding: 0px 32px 16px;
     background: #f8fafc;
   }
-
 
   .bearers-grid {
     display: grid;
