@@ -1,6 +1,6 @@
 ---
-import '../styles/global.css';
-import { SITE_TITLE } from '../consts';
+import "../styles/global.css";
+import { SITE_TITLE } from "../consts";
 
 interface Props {
   title: string;
@@ -19,7 +19,6 @@ const { title, description } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
-
     <nav class="navbar">
       <a href="/" class="nav-brand">SADHWARTHA</a>
       <div class="nav-links">
@@ -39,7 +38,9 @@ const { title, description } = Astro.props;
     <footer class="footer">
       <div>
         <div class="footer-brand">SADHWARTHA</div>
-        <div class="footer-sub">Church of God (Full Gospel) in India, Central West Region</div>
+        <div class="footer-sub">
+          Church of God (Full Gospel) in India, Central West Region
+        </div>
       </div>
       <div class="footer-links">
         <a href="/articles" class="footer-link">Articles</a>
@@ -47,7 +48,6 @@ const { title, description } = Astro.props;
         <a href="/contact" class="footer-link">Contact</a>
       </div>
     </footer>
-
   </body>
 </html>
 
