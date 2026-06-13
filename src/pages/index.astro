@@ -1,42 +1,51 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Navbar from '../components/Navbar.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
-import { getCollection } from 'astro:content';
+import BaseHead from "../components/BaseHead.astro";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import { getCollection } from "astro:content";
 
-const allArticles = await getCollection('blog');
+const allArticles = await getCollection("blog");
 
 // Show latest 4 articles on homepage
 const recentArticles = allArticles
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 4);
 
-const showWelcomeSlide = false; // Set to true to show
+const allNews = await getCollection("news");
 
-// CAROUSEL: Featured articles & custom slides - EASILY EDITABLE
-// Pick specific articles by their ID (folder/file name)
+// Show latest 4 articles on homepage
+const recentNews = allNews
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 4);
+
+const showWelcomeSlide = true; // Set to true to show
+
+// CAROUSEL: Featured articles, news & custom slides - EASILY EDITABLE
+// Pick specific items by their ID (folder/file name)
 // Example IDs: 'en/city-on-a-hill', 'ml/arise-and-shine', etc.
 const carouselSlides = [
   // Article slides - reference by article ID (folder/filename)
-  { type: 'article', id: 'en/city-on-a-hill' },
-  { type: 'article', id: 'en/arise-and-shine' },
+  { type: "article", id: "en/city-on-a-hill" },
+  { type: "article", id: "en/arise-and-shine" },
+
+  // News slides - reference by news ID (folder/filename)
+  { type: "news", id: "ml/mahanaim-43rd-graduation" },
+  { type: "news", id: "ml/gospel-meetings" },
+
   // Custom announcement slides
-  { type: 'announcement', title: 'New Publication Released', subtitle: 'Check out our latest edition', language: 'en' },
+  {
+    type: "announcement",
+    title: "New Publication Released",
+    subtitle: "Check out our latest edition",
+    language: "en",
+  },
 ];
 
-// Get featured articles
-const featuredArticles = carouselSlides
-  .filter(slide => slide.type === 'article')
-  .map(slide => allArticles.find(a => a.id === slide.id))
-  .filter((article): article is typeof allArticles[0] => Boolean(article));
-
-const customSlides = carouselSlides.filter(slide => slide.type === 'announcement');
-
 const LANG_LABELS: Record<string, string> = {
-  en: 'English',
-  ml: 'മലയാളം',
-  hi: 'हिंदी',
+  en: "English",
+  ml: "മലയാളം",
+  hi: "हिंदी",
 };
 ---
 
@@ -47,104 +56,249 @@ const LANG_LABELS: Record<string, string> = {
   </head>
 
   <body>
-
     <Navbar />
 
     <!-- ── CAROUSEL ───────────────────────────────── -->
     <section class="carousel">
       <div class="carousel-inner">
-        {showWelcomeSlide && (
-        <!-- Welcome Slide -->
-        <div class="carousel-item carousel-welcome-item">
-          <div class="carousel-welcome">
-            <p class="welcome-sub">Welcome to the official home of</p>
-            <h1 class="welcome-title">
+        {
+          showWelcomeSlide && (
+            // <!-- Welcome Slide -->
+            <div class="carousel-item carousel-welcome-item">
+              <div class="carousel-welcome">
+                <h1 class="welcome-title">
                   <img src="/sadhwartha_ml.png" alt="സദ്വാർത്ത" />
-              <span class="welcome-en">An official publication of Church of God (Full Gospel) in India, Central West Region</span>
-            </h1>
-          </div>
-        </div>
-        )}
-
-        <!-- Featured Articles -->
-        {featuredArticles.map((article) => (
-          <a href={`/blog/${article.id}`} class="carousel-item carousel-article-item">
-            <div class="carousel-img-wrap">
-              {article.data.heroImage
-                ? <img src={article.data.heroImage.src} alt={article.data.title} class="carousel-img" />
-                : <div class="carousel-img-placeholder">✝</div>
-              }
-            </div>
-            <div class="carousel-overlay"></div>
-            <div class="carousel-content">
-              <div class="carousel-meta">
-                <span class="carousel-lang">{LANG_LABELS[article.data.language] ?? article.data.language}</span>
+                  <span class="welcome-en">
+                    An official publication of Church of God (Full Gospel) in
+                    India, Central West Region
+                  </span>
+                </h1>
               </div>
-              <h2 class="carousel-title">{article.data.title}</h2>
-              <p class="carousel-desc">{article.data.description}</p>
             </div>
-          </a>
-        ))}
+          )
+        }
 
-        <!-- Custom Announcement Slides -->
-        {customSlides.map((slide) => (
-          <div class="carousel-item carousel-announcement-item">
-            <div class="carousel-overlay"></div>
-            <div class="carousel-content">
-              <h2 class="carousel-title">{slide.title}</h2>
-              <p class="carousel-desc">{slide.subtitle}</p>
-            </div>
-          </div>
-        ))}
+        {
+          carouselSlides.map((slide) => {
+            if (slide.type === "article") {
+              const article = allArticles.find((a) => a.id === slide.id);
+
+              if (!article) return null;
+
+              return (
+                <a
+                  href={`/blog/${article.id}`}
+                  class="carousel-item carousel-article-item"
+                >
+                  <div class="carousel-img-wrap">
+                    {article.data.heroImage ? (
+                      <img
+                        src={article.data.heroImage.src}
+                        alt={article.data.title}
+                        class="carousel-img"
+                      />
+                    ) : (
+                      <div class="carousel-img-placeholder">✝</div>
+                    )}
+                  </div>
+
+                  <div class="carousel-overlay" />
+
+                  <div class="carousel-content">
+                    <div class="carousel-meta">
+                      <span class="carousel-lang">
+                        {LANG_LABELS[article.data.language] ??
+                          article.data.language}
+                      </span>
+                    </div>
+
+                    <h2 class="carousel-title">{article.data.title}</h2>
+
+                    <p class="carousel-desc">{article.data.description}</p>
+                  </div>
+                </a>
+              );
+            }
+
+            if (slide.type === "news") {
+              const newsItem = allNews.find((n) => n.id === slide.id);
+
+              if (!newsItem) return null;
+
+              return (
+                <a
+                  href={`/news/${newsItem.id}`}
+                  class="carousel-item carousel-news-item"
+                >
+                  <div class="carousel-img-wrap">
+                    {newsItem.data.heroImage ? (
+                      <img
+                        src={newsItem.data.heroImage.src}
+                        alt={newsItem.data.title}
+                        class="carousel-img"
+                      />
+                    ) : (
+                      <div class="carousel-img-placeholder">📰</div>
+                    )}
+                  </div>
+
+                  <div class="carousel-overlay" />
+
+                  <div class="carousel-content">
+                    <div class="carousel-meta">
+                      <span class="carousel-news-badge">News</span>
+
+                      <span class="carousel-lang">
+                        {LANG_LABELS[newsItem.data.language] ??
+                          newsItem.data.language}
+                      </span>
+                    </div>
+
+                    <h2 class="carousel-title">{newsItem.data.title}</h2>
+
+                    <p class="carousel-desc">{newsItem.data.description}</p>
+                  </div>
+                </a>
+              );
+            }
+
+            return (
+              <div class="carousel-item carousel-announcement-item">
+                <div class="carousel-overlay" />
+
+                <div class="carousel-content">
+                  <h2 class="carousel-title">{slide.title}</h2>
+                  <p class="carousel-desc">{slide.subtitle}</p>
+                </div>
+              </div>
+            );
+          })
+        }
       </div>
 
       <!-- Navigation Buttons -->
-      <button class="carousel-btn carousel-btn-prev" aria-label="Previous slide">❮</button>
-      <button class="carousel-btn carousel-btn-next" aria-label="Next slide">❯</button>
+      <button class="carousel-btn carousel-btn-prev" aria-label="Previous slide"
+        >❮</button
+      >
+      <button class="carousel-btn carousel-btn-next" aria-label="Next slide"
+        >❯</button
+      >
 
       <!-- Dots -->
       <div class="carousel-dots">
-        {showWelcomeSlide && <button class="dot active" data-slide="0" aria-label="Welcome slide"></button>}
-        {[...Array(featuredArticles.length + customSlides.length)].map((_, index) => (
-          <button class={`dot ${!showWelcomeSlide && index === 0 ? 'active' : ''}`} data-slide={showWelcomeSlide ? index + 1 : index} aria-label={`Slide ${index + (showWelcomeSlide ? 2 : 1)}`}></button>
-        ))}
+        {
+          showWelcomeSlide && (
+            <button
+              class="dot active"
+              data-slide="0"
+              aria-label="Welcome slide"
+            />
+          )
+        }
+        {
+          [...Array(carouselSlides.length)].map((_, index) => (
+            <button
+              class={`dot ${!showWelcomeSlide && index === 0 ? "active" : ""}`}
+              data-slide={showWelcomeSlide ? index + 1 : index}
+              aria-label={`Slide ${index + (showWelcomeSlide ? 2 : 1)}`}
+            />
+          ))
+        }
       </div>
     </section>
 
     <!-- ── RECENT ARTICLES ───────────────────────── -->
     <section class="section">
       <div class="section-wrap">
-
         <div class="section-header">
           <h2 class="section-title">Recent Articles</h2>
           <a href="/blog" class="section-more">View all →</a>
         </div>
 
         <div class="articles-grid">
-          {recentArticles.map((article) => (
-            <a href={`/blog/${article.id}`} class="article-card">
-              <div class="card-img-wrap">
-                {article.data.heroImage
-                  ? <img src={article.data.heroImage.src} alt={article.data.title} class="card-img" />
-                  : <div class="card-img-placeholder">✝</div>
-                }
-              </div>
-              <div class="card-body">
-                <div class="card-meta">
-                  <span class="card-lang">{LANG_LABELS[article.data.language] ?? article.data.language}</span>
-                  <span class="card-date">
-                    {new Date(article.data.pubDate).toLocaleDateString('en-IN', {
-                      day: 'numeric', month: 'short', year: 'numeric',
-                    })}
-                  </span>
+          {
+            recentArticles.map((article) => (
+              <a href={`/blog/${article.id}`} class="article-card">
+                <div class="card-img-wrap">
+                  {article.data.heroImage ? (
+                    <img
+                      src={article.data.heroImage.src}
+                      alt={article.data.title}
+                      class="card-img"
+                    />
+                  ) : (
+                    <div class="card-img-placeholder">✝</div>
+                  )}
                 </div>
-                <div class="card-title">{article.data.title}</div>
-                <div class="card-desc">{article.data.description}</div>
-              </div>
-            </a>
-          ))}
+                <div class="card-body">
+                  <div class="card-meta">
+                    {/* <span class="card-lang">{LANG_LABELS[article.data.language] ?? article.data.language}</span> */}
+                    <span class="card-date">
+                      {new Date(article.data.pubDate).toLocaleDateString(
+                        "en-IN",
+                        {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        },
+                      )}
+                    </span>
+                  </div>
+                  <div class="card-title">{article.data.title}</div>
+                  <div class="card-desc">{article.data.description}</div>
+                </div>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-wrap">
+        <div class="section-header">
+          <h2 class="section-title">Recent News</h2>
+          <a href="/news" class="section-more">View all →</a>
         </div>
 
+        <div class="articles-grid">
+          {
+            recentNews.map((newsItem) => (
+              <a href={`/news/${newsItem.id}`} class="article-card">
+                <div class="card-img-wrap">
+                  {newsItem.data.heroImage ? (
+                    <img
+                      src={newsItem.data.heroImage.src}
+                      alt={newsItem.data.title}
+                      class="card-img"
+                    />
+                  ) : (
+                    <div class="card-img-placeholder">📰</div>
+                  )}
+                </div>
+
+                <div class="card-body">
+                  <div class="card-meta">
+                    <span class="card-date">
+                      {new Date(newsItem.data.pubDate).toLocaleDateString(
+                        "en-IN",
+                        {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        },
+                      )}
+                    </span>
+                  </div>
+
+                  <div class="card-title">{newsItem.data.title}</div>
+
+                  <div class="card-desc">{newsItem.data.description}</div>
+                </div>
+              </a>
+            ))
+          }
+        </div>
       </div>
     </section>
 
@@ -172,19 +326,25 @@ const LANG_LABELS: Record<string, string> = {
             <div class="ql-label">Contact</div>
             <div class="ql-sub">Get in touch</div>
           </a>
+          <a href="/archive" class="ql-card">
+            <div class="ql-icon">lll</div>
+            <div class="ql-label">Archive</div>
+            <div class="ql-sub">Previous Editions</div>
+          </a>
         </div>
       </div>
     </section>
 
     <Footer />
-
   </body>
 </html>
 
 <script>
   // Carousel autorotation
-  const carouselInner = document.querySelector('.carousel-inner') as HTMLElement | null;
-  const dots = document.querySelectorAll('.dot');
+  const carouselInner = document.querySelector(
+    ".carousel-inner",
+  ) as HTMLElement | null;
+  const dots = document.querySelectorAll(".dot");
   let currentSlide = 0;
   const totalSlides = dots.length;
   const rotationInterval = 4000; // 4 seconds
@@ -193,10 +353,10 @@ const LANG_LABELS: Record<string, string> = {
     if (!carouselInner) return;
     currentSlide = (n + totalSlides) % totalSlides;
     carouselInner.style.transform = `translateX(-${currentSlide * 100}%)`;
-    
+
     // Update dots
     dots.forEach((dot, index) => {
-      dot.classList.toggle('active', index === currentSlide);
+      dot.classList.toggle("active", index === currentSlide);
     });
   }
 
@@ -209,44 +369,56 @@ const LANG_LABELS: Record<string, string> = {
 
   // Dot click handlers
   dots.forEach((dot) => {
-    dot.addEventListener('click', (e: Event) => {
+    dot.addEventListener("click", (e: Event) => {
       const target = e.target as HTMLElement;
-      goToSlide(parseInt(target.dataset.slide ?? '0'));
+      goToSlide(parseInt(target.dataset.slide ?? "0"));
     });
   });
 
   // Arrow button handlers
-  const prevBtn = document.querySelector('.carousel-btn-prev') as HTMLElement | null;
-  const nextBtn = document.querySelector('.carousel-btn-next') as HTMLElement | null;
+  const prevBtn = document.querySelector(
+    ".carousel-btn-prev",
+  ) as HTMLElement | null;
+  const nextBtn = document.querySelector(
+    ".carousel-btn-next",
+  ) as HTMLElement | null;
 
   if (prevBtn) {
-    prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+    prevBtn.addEventListener("click", () => goToSlide(currentSlide - 1));
   }
 
   if (nextBtn) {
-    nextBtn.addEventListener('click', () => nextSlide());
+    nextBtn.addEventListener("click", () => nextSlide());
   }
 
   // Touch swipe support for mobile
   let touchStartX = 0;
   let touchEndX = 0;
   const swipeThreshold = 50; // Minimum swipe distance in pixels
-  const carousel = document.querySelector('.carousel') as HTMLElement | null;
+  const carousel = document.querySelector(".carousel") as HTMLElement | null;
 
   if (carousel) {
-    carousel.addEventListener('touchstart', (e: TouchEvent) => {
-      touchStartX = e.changedTouches[0].clientX;
-    }, false);
+    carousel.addEventListener(
+      "touchstart",
+      (e: TouchEvent) => {
+        touchStartX = e.changedTouches[0].clientX;
+      },
+      false,
+    );
 
-    carousel.addEventListener('touchend', (e: TouchEvent) => {
-      touchEndX = e.changedTouches[0].clientX;
-      handleSwipe();
-    }, false);
+    carousel.addEventListener(
+      "touchend",
+      (e: TouchEvent) => {
+        touchEndX = e.changedTouches[0].clientX;
+        handleSwipe();
+      },
+      false,
+    );
   }
 
   function handleSwipe(): void {
     const swipeDistance = touchStartX - touchEndX;
-    
+
     // Swipe left (positive distance) = next slide
     if (swipeDistance > swipeThreshold) {
       nextSlide();
@@ -259,11 +431,18 @@ const LANG_LABELS: Record<string, string> = {
 </script>
 
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
   body {
     background: var(--bg-page);
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family:
+      system-ui,
+      -apple-system,
+      sans-serif;
   }
 
   /* ── CAROUSEL ────────────────────────────────── */
@@ -273,7 +452,12 @@ const LANG_LABELS: Record<string, string> = {
     height: 250px;
     overflow: hidden;
     margin-top: var(--navbar-height);
-    background: linear-gradient(135deg, var(--slate) 0%, #0f172a 60%, #1c1917 100%);
+    background: linear-gradient(
+      135deg,
+      var(--slate) 0%,
+      #0f172a 60%,
+      #1c1917 100%
+    );
   }
 
   .carousel-inner {
@@ -294,7 +478,12 @@ const LANG_LABELS: Record<string, string> = {
 
   /* Welcome Slide */
   .carousel-welcome-item {
-    background: linear-gradient(135deg, var(--slate) 0%, #0f172a 60%, #1c1917 100%);
+    background: linear-gradient(
+      135deg,
+      var(--slate) 0%,
+      #0f172a 60%,
+      #1c1917 100%
+    );
   }
 
   .carousel-welcome {
@@ -309,18 +498,27 @@ const LANG_LABELS: Record<string, string> = {
     align-items: center;
     gap: 8px;
     margin-bottom: 16px;
+    opacity: 0;
+    filter: blur(20px);
+    transform: scale(1.2);
+    animation: logoReveal 2s ease-out forwards;
   }
 
-  .welcome-ml {
-    font-size: 36px;
-    font-weight: 700;
-    color: var(--bg-white);
-    line-height: 1.1;
+  .welcome-title img {
+    filter: brightness(0) invert(1);
+  }
+
+  @keyframes logoReveal {
+    to {
+      opacity: 1;
+      filter: blur(0);
+      transform: scale(1);
+    }
   }
 
   .welcome-en {
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 700;
     color: var(--red);
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -339,6 +537,13 @@ const LANG_LABELS: Record<string, string> = {
 
   /* Article Slides */
   .carousel-article-item {
+    background: #000;
+    color: var(--bg-white);
+    text-decoration: none;
+  }
+
+  /* News Slides */
+  .carousel-news-item {
     background: #000;
     color: var(--bg-white);
     text-decoration: none;
@@ -410,6 +615,15 @@ const LANG_LABELS: Record<string, string> = {
     border-radius: 10px;
   }
 
+  .carousel-news-badge {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--bg-white);
+    background: rgba(100, 150, 255, 0.8);
+    padding: 4px 10px;
+    border-radius: 10px;
+  }
+
   .carousel-title {
     font-size: 28px;
     font-weight: 700;
@@ -475,7 +689,9 @@ const LANG_LABELS: Record<string, string> = {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.3s, transform 0.2s;
+    transition:
+      background 0.3s,
+      transform 0.2s;
     opacity: 0.6;
   }
 
@@ -531,7 +747,9 @@ const LANG_LABELS: Record<string, string> = {
     transition: background 0.15s;
   }
 
-  .btn-primary:hover { background: #b01f1f; }
+  .btn-primary:hover {
+    background: #b01f1f;
+  }
 
   .btn-secondary {
     padding: 10px 24px;
@@ -542,15 +760,25 @@ const LANG_LABELS: Record<string, string> = {
     border-radius: 8px;
     border: 1px solid var(--text-dark);
     text-decoration: none;
-    transition: border-color 0.15s, color 0.15s;
+    transition:
+      border-color 0.15s,
+      color 0.15s;
   }
 
-  .btn-secondary:hover { border-color: var(--red); color: var(--red); }
+  .btn-secondary:hover {
+    border-color: var(--red);
+    color: var(--red);
+  }
 
   /* ── SECTIONS ────────────────────────────────── */
-  .section { padding: 48px 32px; }
+  .section {
+    padding: 48px 32px;
+  }
 
-  .section-wrap { max-width: 1100px; margin: 0 auto; }
+  .section-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
 
   .section-header {
     display: flex;
@@ -572,7 +800,9 @@ const LANG_LABELS: Record<string, string> = {
     font-weight: 500;
   }
 
-  .section-more:hover { text-decoration: underline; }
+  .section-more:hover {
+    text-decoration: underline;
+  }
 
   /* ── ARTICLES GRID ───────────────────────────── */
   .articles-grid {
@@ -588,13 +818,15 @@ const LANG_LABELS: Record<string, string> = {
     overflow: hidden;
     text-decoration: none;
     color: inherit;
-    transition: box-shadow 0.15s, transform 0.15s;
+    transition:
+      box-shadow 0.15s,
+      transform 0.15s;
     display: flex;
     flex-direction: column;
   }
 
   .article-card:hover {
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     transform: translateY(-2px);
   }
 
@@ -608,7 +840,7 @@ const LANG_LABELS: Record<string, string> = {
   .card-img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: fill;
     display: block;
   }
 
@@ -623,7 +855,10 @@ const LANG_LABELS: Record<string, string> = {
     background: linear-gradient(135deg, #f8fafc, #f1f5f9);
   }
 
-  .card-body { padding: 14px 16px; flex: 1; }
+  .card-body {
+    padding: 14px 16px;
+    flex: 1;
+  }
 
   .card-meta {
     display: flex;
@@ -655,7 +890,9 @@ const LANG_LABELS: Record<string, string> = {
     margin-bottom: 6px;
   }
 
-  .article-card:hover .card-title { color: var(--red); }
+  .article-card:hover .card-title {
+    color: var(--red);
+  }
 
   .card-desc {
     font-size: 12px;
@@ -737,10 +974,6 @@ const LANG_LABELS: Record<string, string> = {
       padding: 30px;
     }
 
-    .welcome-ml {
-      font-size: 32px;
-    }
-
     .welcome-en {
       font-size: 12px;
     }
@@ -754,27 +987,27 @@ const LANG_LABELS: Record<string, string> = {
     }
 
     .nav-center {
-      gap: 10px;  /* Reduce gap between images */
+      gap: 10px; /* Reduce gap between images */
     }
 
     .center-img-ml {
-      height: 24px;  /* Scale down from 32px */
+      height: 24px; /* Scale down from 32px */
     }
 
     .center-img-cog {
-      height: 28px;  /* Scale down from 38px */
+      height: 28px; /* Scale down from 38px */
     }
 
     .center-img-en {
-      height: 18px;  /* Scale down from 24px */
+      height: 18px; /* Scale down from 24px */
     }
 
     .nav-links {
-      gap: 16px;  /* Reduce link spacing */
+      gap: 16px; /* Reduce link spacing */
     }
 
     .nav-link {
-      font-size: 13px;  /* Smaller text */
+      font-size: 13px; /* Smaller text */
     }
   }
 
@@ -810,10 +1043,6 @@ const LANG_LABELS: Record<string, string> = {
       padding: 25px;
     }
 
-    .welcome-ml {
-      font-size: 28px;
-    }
-
     .welcome-en {
       font-size: 9px;
     }
@@ -846,10 +1075,6 @@ const LANG_LABELS: Record<string, string> = {
     .welcome-title {
       gap: 4px;
       margin-bottom: 12px;
-    }
-
-    .welcome-ml {
-      font-size: 24px;
     }
 
     .welcome-en {
@@ -890,7 +1115,7 @@ const LANG_LABELS: Record<string, string> = {
       height: 8px;
     }
 
-    .navbar { 
+    .navbar {
       padding: 12px 16px;
       flex-wrap: wrap;
       gap: 12px;
@@ -909,7 +1134,7 @@ const LANG_LABELS: Record<string, string> = {
     }
 
     .center-img-ml {
-      height: 18px;  /* Scale down further */
+      height: 18px; /* Scale down further */
     }
 
     .center-img-cog {
@@ -948,21 +1173,40 @@ const LANG_LABELS: Record<string, string> = {
       z-index: 99;
     }
 
-    .nav-links.open { display: flex; }
-    .nav-toggle { display: block; }
+    .nav-links.open {
+      display: flex;
+    }
+    .nav-toggle {
+      display: block;
+    }
 
     .nav-link {
       font-size: 14px;
     }
 
-    .section { padding: 32px 16px; }
-    .quicklinks { padding: 0 16px 32px; }
+    .section {
+      padding: 32px 16px;
+    }
+    .quicklinks {
+      padding: 0 16px 32px;
+    }
 
-    .articles-grid { grid-template-columns: 1fr; }
-    .ql-grid { grid-template-columns: repeat(2, 1fr); }
+    .articles-grid {
+      grid-template-columns: 1fr;
+    }
+    .ql-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
 
-    .footer { padding: 32px 16px 16px; }
-    .footer-inner { flex-direction: column; gap: 24px; }
-    .footer-links-block { gap: 24px; }
+    .footer {
+      padding: 32px 16px 16px;
+    }
+    .footer-inner {
+      flex-direction: column;
+      gap: 24px;
+    }
+    .footer-links-block {
+      gap: 24px;
+    }
   }
 </style>
