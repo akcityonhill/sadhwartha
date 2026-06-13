@@ -1,56 +1,50 @@
 ---
-import BaseHead from '../../components/BaseHead.astro';
-import { SITE_TITLE } from '../../consts';
-import { getCollection } from 'astro:content';
+import BaseHead from "../../components/BaseHead.astro";
+import Navbar from "../../components/Navbar.astro";
+import Footer from "../../components/Footer.astro";
+import { SITE_TITLE } from "../../consts";
+import { getCollection } from "astro:content";
 
-const allArticles = await getCollection('blog');
+const allArticles = await getCollection("blog");
 
 const sorted = allArticles.sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 
 // Language display config
 const LANGUAGES: Record<string, { label: string; nativeLabel: string }> = {
-  en: { label: 'English',   nativeLabel: 'English'   },
-  ml: { label: 'Malayalam', nativeLabel: 'മലയാളം'   },
-  hi: { label: 'Hindi',     nativeLabel: 'हिंदी'      },
+  en: { label: "English", nativeLabel: "English" },
+  ml: { label: "Malayalam", nativeLabel: "മലയാളം" },
+  hi: { label: "Hindi", nativeLabel: "हिंदी" },
 };
 
 // Group by language
-const grouped = sorted.reduce((acc, article) => {
-  const lang = article.data.language;
-  if (!acc[lang]) acc[lang] = [];
-  acc[lang].push(article);
-  return acc;
-}, {} as Record<string, typeof sorted>);
+const grouped = sorted.reduce(
+  (acc, article) => {
+    const lang = article.data.language;
+    if (!acc[lang]) acc[lang] = [];
+    acc[lang].push(article);
+    return acc;
+  },
+  {} as Record<string, typeof sorted>,
+);
 
-const langOrder = ['en', 'ml', 'hi'];
+const langOrder = ["en", "ml", "hi"];
 const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={`Articles | ${SITE_TITLE}`} description="All Sadhwartha articles" />
+    <BaseHead
+      title={`Articles | ${SITE_TITLE}`}
+      description="All Sadhwartha articles"
+    />
   </head>
   <body>
-
-    <nav class="navbar">
-      <a href="/" class="nav-brand">
-        <span class="brand-ml">സദ്വാർത്ത</span>
-        <span class="brand-en">SADHWARTHA</span>
-      </a>
-      <div class="nav-links">
-        <a href="/"       class="nav-link">Home</a>
-        <a href="/blog"   class="nav-link active">Articles</a>
-        <a href="/news"   class="nav-link">News</a>
-        <a href="/about"  class="nav-link">About</a>
-        <a href="/contact" class="nav-link">Contact</a>
-      </div>
-    </nav>
+    <Navbar />
 
     <div class="page-wrap">
-
       <div class="page-header">
         <div class="page-title">Articles</div>
         <div class="page-sub">Publications in English, Malayalam and Hindi</div>
@@ -58,163 +52,128 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
 
       <!-- Language tabs -->
       <div class="lang-tabs">
-        {activeLangs.map((lang, i) => (
-          <a href={`#lang-${lang}`} class={`lang-tab ${i === 0 ? 'active' : ''}`}>
-            <span class="tab-native">{LANGUAGES[lang].nativeLabel}</span>
-            <span class="tab-count">{grouped[lang].length}</span>
-          </a>
-        ))}
+        {
+          activeLangs.map((lang, i) => (
+            <a
+              href={`#lang-${lang}`}
+              class={`lang-tab ${i === 0 ? "active" : ""}`}
+            >
+              <span class="tab-native">{LANGUAGES[lang].nativeLabel}</span>
+              <span class="tab-count">{grouped[lang].length}</span>
+            </a>
+          ))
+        }
       </div>
 
       <!-- Articles grouped by language -->
-      {activeLangs.map((lang) => (
-        <div class="lang-section" id={`lang-${lang}`}>
+      {
+        activeLangs.map((lang) => (
+          <div class="lang-section" id={`lang-${lang}`}>
+            <div class="lang-header">
+              <span class="lang-native">{LANGUAGES[lang].nativeLabel}</span>
+              {lang !== "en" && (
+                <span class="lang-english">{LANGUAGES[lang].label}</span>
+              )}
+            </div>
 
-          <div class="lang-header">
-            <span class="lang-native">{LANGUAGES[lang].nativeLabel}</span>
-            {lang !== 'en' && (
-              <span class="lang-english">{LANGUAGES[lang].label}</span>
-            )}
-          </div>
+            <div class="articles-list">
+              {grouped[lang].map((article) => {
+                // Build the English version URL if translation slug is provided
+                const enSlug = article.data.translations?.en;
+                const enUrl = enSlug ? `/blog/en/${enSlug}` : null;
 
-          <div class="articles-list">
-            {grouped[lang].map((article) => {
-              // Build the English version URL if translation slug is provided
-              const enSlug = article.data.translations?.en;
-              const enUrl  = enSlug ? `/blog/en/${enSlug}` : null;
-
-              return (
-                <div class="article-card">
-                  <a href={`/blog/${article.id}`} class="article-link">
-                    {article.data.heroImage && (
-                      <img
-                        src={article.data.heroImage.src}
-                        alt={article.data.title}
-                        class="article-thumb"
-                      />
+                return (
+                  <div class="article-card">
+                    <a href={`/blog/${article.id}`} class="article-link">
+                      {article.data.heroImage && (
+                        <img
+                          src={article.data.heroImage.src}
+                          alt={article.data.title}
+                          class="article-thumb"
+                        />
+                      )}
+                      <div class="article-body">
+                        <span class="article-date">
+                          {new Date(article.data.pubDate).toLocaleDateString(
+                            "en-IN",
+                            {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            },
+                          )}
+                        </span>
+                        <div class="article-title">{article.data.title}</div>
+                        <div class="article-desc">
+                          {article.data.description}
+                        </div>
+                      </div>
+                    </a>
+                    {lang !== "en" && enUrl && (
+                      <div class="en-version-bar">
+                        <a href={enUrl} class="en-version-link">
+                          View English version →
+                        </a>
+                      </div>
                     )}
-                    <div class="article-body">
-                      <span class="article-date">
-                        {new Date(article.data.pubDate).toLocaleDateString('en-IN', {
-                          day: 'numeric', month: 'long', year: 'numeric',
-                        })}
-                      </span>
-                      <div class="article-title">{article.data.title}</div>
-                      <div class="article-desc">{article.data.description}</div>
-                    </div>
-                  </a>
-                  {lang !== 'en' && enUrl && (
-                    <div class="en-version-bar">
-                      <a href={enUrl} class="en-version-link">
-                        View English version →
-                      </a>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-
-        </div>
-      ))}
-
+        ))
+      }
     </div>
 
-    <footer class="footer">
-      <div>
-        <div class="footer-brand">SADHWARTHA</div>
-        <div class="footer-sub">Church of God (Full Gospel) in India, Central West Region</div>
-      </div>
-      <div class="footer-links">
-        <a href="/blog"    class="footer-link">Articles</a>
-        <a href="/news"    class="footer-link">News</a>
-        <a href="/contact" class="footer-link">Contact</a>
-      </div>
-    </footer>
-
+    <Footer />
   </body>
 </html>
 
 <style>
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+  }
 
   body {
-    background: #f1f5f9;
-    font-family: system-ui, -apple-system, sans-serif;
+    background: var(--bg-page);
+    font-family:
+      system-ui,
+      -apple-system,
+      sans-serif;
     margin: 0;
-    padding: 0 1rem;
-  }
-
-  /* ── NAVBAR ─────────────────────────────────── */
-  .navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 24px;
-    background: #fffbf0;
-    border-bottom: 2px solid #f59e0b;
-    max-width: 1100px;
-    margin: 0 auto 1.5rem;
-    border-radius: 0 0 12px 12px;
-  }
-
-  .nav-brand {
+    padding-top: var(--navbar-height);
     display: flex;
     flex-direction: column;
-    text-decoration: none;
-    line-height: 1.25;
+    min-height: 100vh;
   }
 
-  .brand-ml {
-    font-size: 18px;
-    font-weight: 700;
-    color: #1e293b;
-  }
-
-  .brand-en {
-    font-size: 10px;
-    font-weight: 600;
-    color: #92400e;
-    letter-spacing: 0.14em;
-  }
-
-  .nav-links { display: flex; gap: 20px; }
-
-  .nav-link {
-    font-size: 13px;
-    color: #64748b;
-    text-decoration: none;
-    transition: color 0.15s;
-  }
-
-  .nav-link:hover, .nav-link.active {
-    color: #d97706;
-    font-weight: 500;
-  }
-
-  /* ── PAGE ────────────────────────────────────── */
+  /* ── PAGE WRAPPER ────────────────────────────── */
   .page-wrap {
-    max-width: 760px;
-    margin: 0 auto 3rem;
+    flex: 1;
+    padding: 0px 16px;
+    max-width: 860px;
+    margin: 0 auto;
+    width: 100%;
   }
 
+  /* ── PAGE HEADER ─────────────────────────────── */
   .page-header {
-    background: #1e293b;
+    background: var(--text-primary);
     border-radius: 12px;
     padding: 28px 32px;
-    margin-bottom: 1.5rem;
+    margin: 2rem 0 1.5rem;
   }
 
   .page-title {
     font-size: 26px;
     font-weight: 700;
-    color: #f59e0b;
+    color: var(--red);
     margin-bottom: 4px;
   }
 
   .page-sub {
     font-size: 13px;
-    color: #94a3b8;
+    color: var(--text-muted);
   }
 
   /* ── LANGUAGE TABS ───────────────────────────── */
@@ -231,24 +190,25 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     gap: 6px;
     padding: 7px 16px;
     border-radius: 20px;
-    border: 1.5px solid #e2e8f0;
-    background: #fff;
+    border: 1.5px solid var(--border);
+    background: var(--bg-white);
     text-decoration: none;
-    color: #475569;
+    color: var(--text-secondary);
     font-size: 13px;
     transition: all 0.15s;
   }
 
-  .lang-tab:hover, .lang-tab.active {
-    border-color: #f59e0b;
+  .lang-tab:hover,
+  .lang-tab.active {
+    border-color: var(--red);
     background: #fffbf0;
-    color: #92400e;
+    color: var(--red);
   }
 
   .tab-count {
     font-size: 11px;
-    background: #f1f5f9;
-    color: #94a3b8;
+    background: var(--bg-page);
+    color: var(--text-muted);
     padding: 1px 6px;
     border-radius: 10px;
   }
@@ -264,18 +224,18 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     gap: 8px;
     padding-bottom: 10px;
     margin-bottom: 16px;
-    border-bottom: 2px solid #f59e0b;
+    border-bottom: 2px solid var(--red);
   }
 
   .lang-native {
     font-size: 20px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-primary);
   }
 
   .lang-english {
     font-size: 12px;
-    color: #94a3b8;
+    color: var(--text-muted);
   }
 
   /* ── ARTICLE CARDS ───────────────────────────── */
@@ -286,15 +246,15 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
   }
 
   .article-card {
-    background: #fff;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-white);
+    border: 1px solid var(--border);
     border-radius: 12px;
     overflow: hidden;
     transition: box-shadow 0.15s;
   }
 
   .article-card:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
   }
 
   .article-link {
@@ -307,96 +267,92 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
   }
 
   .article-thumb {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
+    width: 120px;
+    height: 90px;
+    object-fit: fill;
     border-radius: 8px;
     flex-shrink: 0;
-    background: #f1f5f9;
+    background: var(--bg-page);
   }
 
-  .article-body { flex: 1; }
+  .article-body {
+    flex: 1;
+  }
 
   .article-date {
     display: block;
     font-size: 11px;
-    color: #94a3b8;
+    color: var(--text-muted);
     margin-bottom: 4px;
   }
 
   .article-title {
     font-size: 15px;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text-primary);
     margin-bottom: 4px;
     line-height: 1.35;
   }
 
-  .article-card:hover .article-title { color: #d97706; }
+  .article-card:hover .article-title {
+    color: var(--red);
+  }
 
   .article-desc {
     font-size: 13px;
-    color: #64748b;
+    color: var(--text-secondary);
     line-height: 1.5;
   }
 
   /* ── ENGLISH VERSION LINK ────────────────────── */
   .en-version-bar {
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid var(--border-light);
     padding: 8px 16px;
     background: #fffbf0;
   }
 
   .en-version-link {
     font-size: 12px;
-    color: #d97706;
+    color: var(--red);
     text-decoration: none;
     font-weight: 500;
   }
 
-  .en-version-link:hover { text-decoration: underline; }
-
-  /* ── FOOTER ──────────────────────────────────── */
-  .footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #1e293b;
-    border-radius: 12px;
-    padding: 16px 24px;
-    max-width: 1100px;
-    margin: 0 auto 1.5rem;
+  .en-version-link:hover {
+    text-decoration: underline;
   }
 
-  .footer-brand {
-    font-size: 13px;
-    font-weight: 600;
-    color: #f59e0b;
-    letter-spacing: 0.08em;
+  /* ── TABLET ──────────────────────────────────── */
+  @media (max-width: 768px) {
+    body {
+      padding-top: 45px;
+    }
+    .page-wrap {
+      padding: 0rem 1rem 0rem;
+    }
+    .page-header {
+      padding: 20px;
+      margin: 1.5rem 0 1rem;
+    }
+    .article-link {
+      gap: 12px;
+    }
   }
-
-  .footer-sub {
-    font-size: 11px;
-    color: #64748b;
-    margin-top: 2px;
-  }
-
-  .footer-links { display: flex; gap: 16px; }
-
-  .footer-link {
-    font-size: 11px;
-    color: #64748b;
-    text-decoration: none;
-  }
-
-  .footer-link:hover { color: #f59e0b; }
 
   /* ── MOBILE ──────────────────────────────────── */
-  @media (max-width: 640px) {
-    .navbar { padding: 12px 16px; }
-    .nav-links { gap: 12px; flex-wrap: wrap; }
-    .page-header { padding: 20px; }
-    .article-link { gap: 12px; }
-    .footer { flex-direction: column; gap: 12px; text-align: center; }
+  @media (max-width: 480px) {
+    body {
+      padding-top: 45px;
+    }
+    .page-wrap {
+      padding: 0rem 1rem 0rem;
+    }
+    .page-header {
+      padding: 20px;
+      margin: 1.5rem 0 1rem;
+    }
+    .article-link {
+      gap: 12px;
+    }
   }
 </style>
