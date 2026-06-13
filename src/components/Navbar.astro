@@ -6,31 +6,84 @@
 <nav class="navbar" id="navbar">
   <div class="nav-left">
     <a href="/" class="nav-logo" aria-label="Sadhwartha Home">
-      <img src="/sadhwartha_logo.png" alt="Sadhwartha Logo" class="logo-img" loading="lazy" />
+      <img
+        src="/sadhwartha_logo.png"
+        alt="Sadhwartha Logo"
+        class="logo-img"
+        loading="lazy"
+      />
     </a>
   </div>
 
   <a href="/" class="nav-center" aria-label="Sadhwartha Home">
-    <img src="/sadhwartha_ml.png" alt="സദ്വാർത്ത" class="center-img-ml" loading="lazy" />
-    <img src="/cog_logo.png" alt="Church of God Logo" class="center-img-cog" loading="lazy" />
-    <img src="/sadhwartha_en.png" alt="SADHWARTHA" class="center-img-en" loading="lazy" />
+    <img
+      src="/sadhwartha_ml.png"
+      alt="സദ്വാർത്ത"
+      class="center-img-ml"
+      loading="lazy"
+    />
+    <img
+    src="/cog_logo.png"
+    alt="Church of God Logo"
+      class="center-img-cog"
+      loading="lazy"
+    />
+    <img
+      src="/sadhwartha_en.png"
+      alt="SADHWARTHA"
+      class="center-img-en"
+      loading="lazy"
+    />
   </a>
 
   <div class="nav-right">
     <div class="nav-links" id="navLinks" role="navigation">
-      <a href="/blog" class="nav-link" data-active={Astro.url.pathname.startsWith("/blog")}>Articles</a>
-      <a href="/news" class="nav-link" data-active={Astro.url.pathname.startsWith("/news")}>News</a>
-      <a href="/about" class="nav-link" data-active={Astro.url.pathname.startsWith("/about")}>About</a>
-      <a href="/contact" class="nav-link" data-active={Astro.url.pathname.startsWith("/contact")}>Contact</a>
+      <a href="/" class="nav-link" data-active={Astro.url.pathname === "/"}
+        >Home</a
+      >
+      <a
+        href="/blog"
+        class="nav-link"
+        data-active={Astro.url.pathname.startsWith("/blog")}>Articles</a
+      >
+      <a
+        href="/news"
+        class="nav-link"
+        data-active={Astro.url.pathname.startsWith("/news")}>News</a
+      >
+      <a
+        href="/archive"
+        class="nav-link"
+        data-active={Astro.url.pathname.startsWith("/archive")}>Archive</a
+      >
+      <a
+        href="/about"
+        class="nav-link"
+        data-active={Astro.url.pathname.startsWith("/about")}>About</a
+      >
+      <a
+        href="/contact"
+        class="nav-link"
+        data-active={Astro.url.pathname.startsWith("/contact")}>Contact</a
+      >
     </div>
-    <button 
-      class="nav-toggle" 
+    <button
+      class="nav-toggle"
       id="navToggle"
-      aria-label="Toggle navigation menu" 
+      aria-label="Toggle navigation menu"
       aria-expanded="false"
       aria-controls="navLinks"
     >
-      <svg class="hamburger" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <svg
+        class="hamburger"
+        viewBox="0 0 24 24"
+        width="24"
+        height="24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
         <line x1="3" y1="6" x2="21" y2="6" class="line-top"></line>
         <line x1="3" y1="12" x2="21" y2="12" class="line-middle"></line>
         <line x1="3" y1="18" x2="21" y2="18" class="line-bottom"></line>
@@ -43,7 +96,7 @@
   /* ──────────────────────────────────────────────────────────── */
   /* NAVBAR - Production ready, fully responsive & accessible */
   /* ──────────────────────────────────────────────────────────── */
-  
+
   .navbar {
     display: flex;
     align-items: center;
@@ -94,7 +147,7 @@
   }
 
   .logo-img {
-    height: 42px;
+    height: 62px;
     width: auto;
     display: block;
   }
@@ -106,11 +159,12 @@
     justify-content: center;
     gap: 7px;
     position: absolute;
-    left: 50%;
+    /* left: 50%; */
     top: 50%;
     transform: translate(-50%, -50%);
     min-width: 0;
     padding: 4px;
+    padding-left: 650px;
     margin: -4px;
   }
 
@@ -160,9 +214,11 @@
   .nav-link {
     font-size: 17px;
     font-weight: 500;
-    color: #003049;
+    color: var(--nav-link-color);
     text-decoration: none;
-    transition: color 0.15s ease, opacity 0.15s ease;
+    transition:
+      color 0.15s ease,
+      opacity 0.15s ease;
     position: relative;
     display: inline-flex;
     align-items: center;
@@ -183,7 +239,7 @@
   .nav-link[data-active="true"] {
     color: var(--red);
     font-weight: 600;
-  } 
+  }
 
   /* ── HAMBURGER MENU TOGGLE ────────────────────────────────── */
   .nav-toggle {
@@ -214,12 +270,14 @@
     display: block;
     width: 24px;
     height: 24px;
-    color: #475569;
+    color: var(--hamburger-color);
     transition: all 0.3s ease;
   }
 
   .hamburger line {
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
     transform-origin: center;
   }
 
@@ -246,6 +304,7 @@
 
     .nav-center {
       gap: 4px;
+      padding-left: 550px;
     }
 
     .center-img-ml {
@@ -276,6 +335,9 @@
       gap: 12px;
     }
 
+    .nav-center {
+      padding-left: 480px;
+    }
     .center-img-ml {
       height: 22px;
     }
@@ -319,6 +381,7 @@
       top: 50%;
       transform: translate(-50%, -50%);
       gap: 4px;
+      padding: 4px;
     }
 
     .center-img-ml {
@@ -352,7 +415,7 @@
       left: 0;
       right: 0;
       width: 100vw;
-      background: #fffbf0;
+      background: var(--mobile-menu-bg);
       flex-direction: column;
       padding: 12px 0;
       gap: 0;
@@ -376,7 +439,7 @@
     }
 
     .nav-link:hover {
-      background: rgba(214, 40, 40, 0.1);
+      background: var(--red-hover-light);
     }
 
     .nav-link[data-active="true"]::after {
@@ -384,7 +447,7 @@
     }
 
     .nav-link[data-active="true"] {
-      background: rgba(214, 40, 40, 0.15);
+      background: var(--red-hover-lighter);
       border-left: 3px solid var(--red);
       padding-left: 21px;
     }
@@ -414,50 +477,48 @@
     .center-img-en {
       height: 12px;
       transform: translateY(3px) scaleY(0.85);
-
     }
 
     .nav-link {
       font-size: 15px;
       padding: 10px 20px;
     }
-    
   }
 </style>
 
 <script>
   // Navbar toggle functionality
-  const navToggle = document.getElementById('navToggle');
-  const navLinks = document.getElementById('navLinks');
+  const navToggle = document.getElementById("navToggle");
+  const navLinks = document.getElementById("navLinks");
 
   if (navToggle && navLinks) {
-    navToggle.addEventListener('click', () => {
-      const isOpen = navLinks.classList.toggle('open');
-      navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    navToggle.addEventListener("click", () => {
+      const isOpen = navLinks.classList.toggle("open");
+      navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
     });
 
     // Close menu when a link is clicked
-    navLinks.querySelectorAll('.nav-link').forEach(link => {
-      link.addEventListener('click', () => {
-        navLinks.classList.remove('open');
-        navToggle.setAttribute('aria-expanded', 'false');
+    navLinks.querySelectorAll(".nav-link").forEach((link) => {
+      link.addEventListener("click", () => {
+        navLinks.classList.remove("open");
+        navToggle.setAttribute("aria-expanded", "false");
       });
     });
 
     // Close menu when clicking outside
-    document.addEventListener('click', (e: Event) => {
+    document.addEventListener("click", (e: Event) => {
       const target = e.target as HTMLElement;
-      if (target && !target.closest('.navbar')) {
-        navLinks.classList.remove('open');
-        navToggle.setAttribute('aria-expanded', 'false');
+      if (target && !target.closest(".navbar")) {
+        navLinks.classList.remove("open");
+        navToggle.setAttribute("aria-expanded", "false");
       }
     });
 
     // Close menu on Escape key
-    document.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && navLinks.classList.contains('open')) {
-        navLinks.classList.remove('open');
-        navToggle.setAttribute('aria-expanded', 'false');
+    document.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (e.key === "Escape" && navLinks.classList.contains("open")) {
+        navLinks.classList.remove("open");
+        navToggle.setAttribute("aria-expanded", "false");
       }
     });
   }
