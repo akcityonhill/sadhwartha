@@ -5,8 +5,18 @@
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-brand-block">
-      <img src="/sadhwartha_ml.png" alt="സദ്വാർത്ത" class="footer-brand-ml" loading="lazy" />
-      <img src="/sadhwartha_en.png" alt="SADHWARTHA" class="footer-brand-en" loading="lazy" />
+      <img
+        src="/sadhwartha_ml.png"
+        alt="സദ്വാർത്ത"
+        class="footer-brand-ml"
+        loading="lazy"
+      />
+      <img
+        src="/sadhwartha_en.png"
+        alt="SADHWARTHA"
+        class="footer-brand-en"
+        loading="lazy"
+      />
       <div class="footer-tagline">
         Church of God (Full Gospel) in India<br />Central West Region
       </div>
@@ -14,12 +24,12 @@
     <div class="footer-links-block">
       <div class="footer-col">
         <div class="footer-col-title">Publication</div>
-        <a href="/blog"    class="footer-link">Articles</a>
-        <a href="/news"    class="footer-link">News</a>
+        <a href="/blog" class="footer-link">Articles</a>
+        <a href="/news" class="footer-link">News</a>
       </div>
       <div class="footer-col">
         <div class="footer-col-title">Info</div>
-        <a href="/about"   class="footer-link">About Us</a>
+        <a href="/about" class="footer-link">About Us</a>
         <a href="/contact" class="footer-link">Contact</a>
       </div>
     </div>
@@ -32,7 +42,7 @@
 <style>
   /* ── FOOTER ──────────────────────────────────── */
   .footer {
-    background: #0f172a;
+    background: var(--navy);
     padding: 40px 32px 16px;
   }
 
@@ -44,7 +54,7 @@
     gap: 40px;
     flex-wrap: wrap;
     padding-bottom: 32px;
-    border-bottom: 1px solid #1e293b;
+    border-bottom: 1px solid var(--slate);
   }
 
   .footer-brand-ml {
@@ -63,7 +73,7 @@
 
   .footer-tagline {
     font-size: 12px;
-    color: #475569;
+    color: var(--text-muted);
     line-height: 1.6;
   }
 
@@ -81,7 +91,7 @@
   .footer-col-title {
     font-size: 11px;
     font-weight: 600;
-    color: #64748b;
+    color: var(--text-secondary);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     margin-bottom: 4px;
@@ -89,7 +99,7 @@
 
   .footer-link {
     font-size: 13px;
-    color: #475569;
+    color: var(--text-muted);
     text-decoration: none;
     transition: color 0.15s;
   }
@@ -102,7 +112,7 @@
     max-width: 1100px;
     margin: 16px auto 0;
     font-size: 11px;
-    color: #334155;
+    color: var(--text-secondary);
     text-align: center;
   }
 
@@ -138,27 +148,4 @@
       margin-right: auto;
     }
   }
-</style>
-
-</footer>
-<style>
-	footer {
-		padding: 2em 1em 6em 1em;
-		background: linear-gradient(var(--gray-gradient)) no-repeat;
-		color: rgb(var(--gray));
-		text-align: center;
-	}
-	.social-links {
-		display: flex;
-		justify-content: center;
-		gap: 1em;
-		margin-top: 1em;
-	}
-	.social-links a {
-		text-decoration: none;
-		color: rgb(var(--gray));
-	}
-	.social-links a:hover {
-		color: rgb(var(--gray-dark));
-	}
 </style>
