@@ -3,7 +3,7 @@ title: Arise and Shine!
 description: A call to rise in faith and reflect the glory of God in every season of life.
 pubDate: 2026-03-01
 language: en
-heroImage: ../../../../public/images/arise_and_shine.png
+heroImage: ../../../../public/uploads/blog/en/arise-and-shine/hero.png
 translations:
   ml: arise-and-shine
   hi: arise-and-shine
