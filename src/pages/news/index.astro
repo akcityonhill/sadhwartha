@@ -1,0 +1,358 @@
+---
+import BaseHead from "../../components/BaseHead.astro";
+import Navbar from "../../components/Navbar.astro";
+import Footer from "../../components/Footer.astro";
+import { SITE_TITLE } from "../../consts";
+import { type CollectionEntry, getCollection } from "astro:content";
+
+const allArticles: CollectionEntry<"news">[] = await getCollection("news");
+
+const sorted = allArticles.sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+// Language display config
+const LANGUAGES: Record<string, { label: string; nativeLabel: string }> = {
+  en: { label: "English", nativeLabel: "English" },
+  ml: { label: "Malayalam", nativeLabel: "മലയാളം" },
+  hi: { label: "Hindi", nativeLabel: "हिंदी" },
+};
+
+// Group by language
+const grouped = sorted.reduce(
+  (acc, article) => {
+    const lang = article.data.language;
+    if (!acc[lang]) acc[lang] = [];
+    acc[lang].push(article);
+    return acc;
+  },
+  {} as Record<string, CollectionEntry<"news">[]>,
+);
+
+const langOrder = ["en", "ml", "hi"];
+const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead
+      title={`News | ${SITE_TITLE}`}
+      description="All Sadhwartha news"
+    />
+  </head>
+  <body>
+    <Navbar />
+
+    <div class="page-wrap">
+      <div class="page-header">
+        <div class="page-title">News</div>
+        <div class="page-sub">Updates in English, Malayalam and Hindi</div>
+      </div>
+
+      <!-- Language tabs -->
+      <div class="lang-tabs">
+        {
+          activeLangs.map((lang, i) => (
+            <a
+              href={`#lang-${lang}`}
+              class={`lang-tab ${i === 0 ? "active" : ""}`}
+            >
+              <span class="tab-native">{LANGUAGES[lang].nativeLabel}</span>
+              <span class="tab-count">{grouped[lang].length}</span>
+            </a>
+          ))
+        }
+      </div>
+
+      <!-- News grouped by language -->
+      {
+        activeLangs.map((lang) => (
+          <div class="lang-section" id={`lang-${lang}`}>
+            <div class="lang-header">
+              <span class="lang-native">{LANGUAGES[lang].nativeLabel}</span>
+              {lang !== "en" && (
+                <span class="lang-english">{LANGUAGES[lang].label}</span>
+              )}
+            </div>
+
+            <div class="articles-list">
+              {grouped[lang].map((article) => {
+                // Build the English version URL if translation slug is provided
+                const enSlug = article.data.translations?.en;
+                const enUrl = enSlug ? `/news/en/${enSlug}` : null;
+
+                return (
+                  <div class="article-card">
+                    <a href={`/news/${article.id}`} class="article-link">
+                      {article.data.heroImage && (
+                        <img
+                          src={article.data.heroImage.src}
+                          alt={article.data.title}
+                          class="article-thumb"
+                        />
+                      )}
+                      <div class="article-body">
+                        <span class="article-date">
+                          {new Date(article.data.pubDate).toLocaleDateString(
+                            "en-IN",
+                            {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            },
+                          )}
+                        </span>
+                        <div class="article-title">{article.data.title}</div>
+                        <div class="article-desc">
+                          {article.data.description}
+                        </div>
+                      </div>
+                    </a>
+                    {lang !== "en" && enUrl && (
+                      <div class="en-version-bar">
+                        <a href={enUrl} class="en-version-link">
+                          View English version →
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <Footer />
+  </body>
+</html>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background: var(--bg-page);
+    font-family:
+      system-ui,
+      -apple-system,
+      sans-serif;
+    margin: 0;
+    padding-top: var(--navbar-height);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* ── PAGE WRAPPER ────────────────────────────── */
+  .page-wrap {
+    flex: 1;
+    padding: 0px 16px;
+    max-width: 860px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* ── PAGE HEADER ─────────────────────────────── */
+  .page-header {
+    background: var(--text-primary);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin: 2rem 0 1.5rem;
+  }
+
+  .page-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--red);
+    margin-bottom: 4px;
+  }
+
+  .page-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  /* ── LANGUAGE TABS ───────────────────────────── */
+  .lang-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .lang-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-white);
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 13px;
+    transition: all 0.15s;
+  }
+
+  .lang-tab:hover,
+  .lang-tab.active {
+    border-color: var(--red);
+    background: #fffbf0;
+    color: var(--red);
+  }
+
+  .tab-count {
+    font-size: 11px;
+    background: var(--bg-page);
+    color: var(--text-muted);
+    padding: 1px 6px;
+    border-radius: 10px;
+  }
+
+  /* ── LANGUAGE SECTION ────────────────────────── */
+  .lang-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .lang-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding-bottom: 10px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--red);
+  }
+
+  .lang-native {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .lang-english {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* ── ARTICLE CARDS ───────────────────────────── */
+  .articles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .article-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.15s;
+  }
+
+  .article-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+  }
+
+  .article-link {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .article-thumb {
+    width: 120px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+    background: var(--bg-page);
+  }
+
+  .article-body {
+    flex: 1;
+  }
+
+  .article-date {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .article-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    line-height: 1.35;
+  }
+
+  .article-card:hover .article-title {
+    color: var(--red);
+  }
+
+  .article-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* ── ENGLISH VERSION LINK ────────────────────── */
+  .en-version-bar {
+    border-top: 1px solid var(--border-light);
+    padding: 8px 16px;
+    background: #fffbf0;
+  }
+
+  .en-version-link {
+    font-size: 12px;
+    color: var(--red);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .en-version-link:hover {
+    text-decoration: underline;
+  }
+
+  /* ── TABLET ──────────────────────────────────── */
+  @media (max-width: 768px) {
+    body {
+      padding-top: 45px;
+    }
+    .page-wrap {
+      padding: 0rem 1rem 0rem;
+    }
+    .page-header {
+      padding: 20px;
+      margin: 1.5rem 0 1rem;
+    }
+    .article-link {
+      gap: 12px;
+    }
+  }
+
+  /* ── MOBILE ──────────────────────────────────── */
+  @media (max-width: 480px) {
+    body {
+      padding-top: 45px;
+    }
+    .page-wrap {
+      padding: 0rem 1rem 0rem;
+    }
+    .page-header {
+      padding: 20px;
+      margin: 1.5rem 0 1rem;
+    }
+    .article-link {
+      gap: 12px;
+    }
+  }
+</style>
