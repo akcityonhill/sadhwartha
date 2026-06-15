@@ -240,10 +240,7 @@ const pageUrl = Astro.site
 
   body {
     background: var(--bg-page);
-    font-family:
-      system-ui,
-      -apple-system,
-      sans-serif;
+    font-family: var(--font-body);   /* inherits per-language font from global.css */
     margin: 0;
     padding: var(--navbar-height) 1rem 0;
     display: flex;
@@ -330,6 +327,7 @@ const pageUrl = Astro.site
     margin: 0;
     flex: 1;
     min-width: 0;
+    font-family: var(--font-body);   /* add this line */
   }
 
   .author-card {
@@ -406,9 +404,10 @@ const pageUrl = Astro.site
 
   /* ── PROSE CONTENT ──────────────────────────── */
   .prose {
-    font-size: 16px;
-    line-height: 1.8;
+    font-size: 1.125rem;    /* 18px — comfortable reading size */
+    line-height: 1.85;
     color: var(--text-dark);
+    font-family: var(--font-body);  /* ensures prose inherits the lang-specific font */
   }
 
   .prose h2 {
@@ -550,7 +549,7 @@ const pageUrl = Astro.site
       font-size: 22px;
     }
     .prose {
-      font-size: 15px;
+      font-size: 1rem;    /* 16px on smaller screens — still readable */
     }
     .article-wrap {
       margin: 18px auto 16px;
@@ -583,7 +582,7 @@ const pageUrl = Astro.site
       font-size: 22px;
     }
     .prose {
-      font-size: 15px;
+      font-size: 1rem;    /* 16px on smaller screens — still readable */
     }
     .article-wrap {
       margin: 14px auto 16px;

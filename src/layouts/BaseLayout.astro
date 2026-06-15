@@ -1,5 +1,5 @@
 ---
-import "../styles/global.css";
+import BaseHead from "../components/BaseHead.astro";
 import { SITE_TITLE } from "../consts";
 
 interface Props {
@@ -7,23 +7,19 @@ interface Props {
   description?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description = "" } = Astro.props;
 ---
 
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title} | {SITE_TITLE}</title>
-    {description && <meta name="description" content={description} />}
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <BaseHead title={`${title} | ${SITE_TITLE}`} description={description} />
   </head>
   <body>
     <nav class="navbar">
       <a href="/" class="nav-brand">SADHWARTHA</a>
       <div class="nav-links">
         <a href="/" class="nav-link">Home</a>
-        <a href="/articles" class="nav-link">Articles</a>
+        <a href="/blog" class="nav-link">Articles</a>
         <a href="/archive" class="nav-link">Archive</a>
         <a href="/news" class="nav-link">News</a>
         <a href="/about" class="nav-link">About</a>
@@ -43,7 +39,7 @@ const { title, description } = Astro.props;
         </div>
       </div>
       <div class="footer-links">
-        <a href="/articles" class="footer-link">Articles</a>
+        <a href="/blog" class="footer-link">Articles</a>
         <a href="/archive" class="footer-link">Archive</a>
         <a href="/contact" class="footer-link">Contact</a>
       </div>
@@ -62,23 +58,30 @@ const { title, description } = Astro.props;
     margin: 1rem auto;
     max-width: 1100px;
   }
+
   .nav-brand {
     font-size: 16px;
     font-weight: 500;
-    color: var(--amber);
+    color: var(--orange-light);   /* was --amber, which doesn't exist */
     letter-spacing: 0.1em;
+    font-family: var(--font-ui);  /* UI chrome stays sans-serif */
   }
+
   .nav-links {
     display: flex;
     gap: 20px;
   }
+
   .nav-link {
     font-size: 13px;
     color: var(--text-muted);
+    font-family: var(--font-ui);
   }
+
   .nav-link:hover {
-    color: var(--amber);
+    color: var(--orange-light);   /* was --amber */
   }
+
   .footer {
     display: flex;
     align-items: center;
@@ -89,28 +92,37 @@ const { title, description } = Astro.props;
     margin: 2rem auto 1rem;
     max-width: 1100px;
   }
+
   .footer-brand {
     font-size: 13px;
     font-weight: 500;
-    color: var(--amber);
+    color: var(--orange-light);   /* was --amber */
     letter-spacing: 0.08em;
+    font-family: var(--font-ui);
   }
+
   .footer-sub {
     font-size: 11px;
     color: var(--text-muted);
     margin-top: 2px;
+    font-family: var(--font-ui);
   }
+
   .footer-links {
     display: flex;
     gap: 16px;
   }
+
   .footer-link {
     font-size: 11px;
     color: var(--text-muted);
+    font-family: var(--font-ui);
   }
+
   .footer-link:hover {
-    color: var(--amber);
+    color: var(--orange-light);   /* was --amber */
   }
+
   main {
     max-width: 1100px;
     margin: 0 auto;

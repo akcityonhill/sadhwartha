@@ -2,6 +2,13 @@
   /* ── NAVBAR LAYOUT ──────────────────────────────── */
   --navbar-height: 58px; /* Update this when navbar height changes */
 
+  /* ── FONTS ──────────────────────────────────────── */
+  --font-ui:   system-ui, -apple-system, sans-serif;
+  --font-en:   'Lora', Georgia, serif;
+  --font-ml:   'Noto Serif Malayalam', serif;
+  --font-hi:   'Tiro Devanagari', serif;
+  --font-body: var(--font-en);
+
   /* ── PRIMARY PALETTE ────────────────────────────── */
   --navy: #0f172a;
   --red: #d62828;
@@ -36,7 +43,6 @@
 
 html {
   scroll-padding-top: var(--navbar-height);
-  /* Scrollbar styling for Firefox */
   scrollbar-color: #cbd5e1 #f1f5f9;
   scrollbar-width: thin;
 }
@@ -60,10 +66,7 @@ html {
 }
 
 body {
-  font-family:
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: var(--font-body);
   background: var(--bg-page);
   color: var(--text-primary);
   line-height: 1.7;
@@ -87,9 +90,33 @@ img {
   height: auto;
 }
 
+/* ── PER-LANGUAGE FONT OVERRIDES ────────────────── */
+:lang(ml) {
+  --font-body: var(--font-ml);
+  line-height: 1.9;
+}
+
+:lang(hi) {
+  --font-body: var(--font-hi);
+  line-height: 1.9;
+}
+
+/* ── ARTICLE READING TYPOGRAPHY ─────────────────── */
+.prose {
+  font-size: 1.125rem;
+  line-height: 1.85;
+  max-width: 68ch;
+}
+
+.prose :lang(ml),
+.prose :lang(hi) {
+  font-size: 1.1rem;
+  line-height: 2.0;
+}
+
 /* ── MOBILE LAYOUT ────────────────────────────── */
 @media (max-width: 640px) {
   :root {
-    --navbar-height: 50px; /* Mobile navbar is smaller */
+    --navbar-height: 50px;
   }
 }
