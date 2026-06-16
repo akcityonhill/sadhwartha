@@ -1,9 +1,9 @@
 ---
 title: സുവിശേഷ യോഗങ്ങൾ
 description: ""
-pubDate: 2026-06-04
+pubDate: 2026-05-13
 language: ml
-heroImage: ""
+heroImage: ../../../../public/uploads/news/ml/gospel-meetings/hero.jpeg
 translations:
   en: ""
 ---

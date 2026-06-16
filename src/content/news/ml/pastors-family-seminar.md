@@ -1,9 +1,9 @@
 ---
 title: പാസ്റ്റേഴ്‌സ് ഫാമിലി സെമിനാർ
 description: ""
-pubDate: 2026-06-04
+pubDate: 2026-05-15
 language: ml
-heroImage: ""
+heroImage: ../../../../public/uploads/news/ml/pastors-family-seminar/hero.jpeg
 translations:
   en: ""
 ---

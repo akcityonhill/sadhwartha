@@ -1,7 +1,7 @@
 ---
 title: सुनो, समझो, बदलो
 description: ""
-author: Pr. M. P. Gautam
+author: पास्टर एम. पी. गौतम
 designation: Evangelism Director, COG CWR
 authorImage: ../../../../public/uploads/blog/hi/listen-understand-change/author.png
 pubDate: 2026-06-02
