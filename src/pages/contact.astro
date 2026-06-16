@@ -223,7 +223,7 @@ const contactInfo = {
             </div>
 
             <p class="submission-note-compact">
-              Include your name, article title, A single sentance description,
+              Include your name, article title, a single sentance description,
               content, and images.
             </p>
           </div>
@@ -367,8 +367,8 @@ const contactInfo = {
   .form-input:focus,
   .form-textarea:focus {
     outline: none;
-    border-color: #d62828;
-    box-shadow: 0 0 0 3px rgba(214, 40, 40, 0.1);
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(122, 99, 99, 0.667);
   }
 
   .form-textarea {
@@ -379,7 +379,7 @@ const contactInfo = {
   .btn-submit {
     width: 100%;
     padding: 14px 24px;
-    background: #d62828;
+    background: var(--red);
     color: white;
     border: none;
     border-radius: 6px;
@@ -392,7 +392,7 @@ const contactInfo = {
   }
 
   .btn-submit:hover {
-    background: #b01f1f;
+    filter: brightness(130%);
   }
 
   .btn-submit:active {
@@ -492,7 +492,7 @@ const contactInfo = {
   }
 
   .info-value:hover {
-    color: #d62828;
+    color: var(--red);
   }
 
   /* ── ARTICLE SUBMISSION CARD ──────────────────────────────────── */
@@ -530,7 +530,7 @@ const contactInfo = {
 
   .submission-method:hover {
     background: #f1f5f9;
-    border-left-color: #d62828;
+    border-left-color: var(--red);
   }
 
   .submission-icon {
