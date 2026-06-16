@@ -179,12 +179,14 @@
   .center-img-ml {
     height: 32px;
     width: auto;
+      filter: brightness(0) saturate(100%) invert(27%) sepia(30%) saturate(1894%) hue-rotate(204deg) brightness(92%) contrast(92%);
   }
 
   .center-img-cog {
     height: 38px;
     width: auto;
     opacity: 0.8;
+     filter: brightness(0) saturate(100%) invert(32%) sepia(21%) saturate(1304%) hue-rotate(343deg) brightness(95%) contrast(89%);
   }
 
   .center-img-en {
@@ -192,6 +194,7 @@
     width: auto;
     transform: translateY(5.5px) scaleY(0.85);
     transform-origin: top;
+      filter: brightness(0) saturate(100%) invert(27%) sepia(30%) saturate(1894%) hue-rotate(204deg) brightness(92%) contrast(92%);
   }
 
   /* ── RIGHT SECTION: LINKS & TOGGLE ────────────────────────── */
@@ -236,10 +239,33 @@
     color: var(--red);
   }
 
-  .nav-link[data-active="true"] {
-    color: var(--red);
-    font-weight: 600;
-  }
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 2px;
+
+  width: 100%;
+  height: 2px;
+
+  background: var(--red);
+
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.25s ease;
+}
+
+.nav-link:hover::after {
+  transform: scaleX(0.5);
+}
+
+.nav-link[data-active="true"]::after {
+  transform: scaleX(1);
+}
+
+.nav-link[data-active="true"] {
+  color: var(--red);
+}
 
   /* ── HAMBURGER MENU TOGGLE ────────────────────────────────── */
   .nav-toggle {
