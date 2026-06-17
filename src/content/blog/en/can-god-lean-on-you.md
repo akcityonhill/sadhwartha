@@ -1,5 +1,5 @@
 ---
-title: CAN GOD LEAN ON YOU?
+title: Can God lean on you?
 description: Why God Still Builds His Kingdom Through Covenant Pillars
 author: Pr. Viju Thomas
 designation: ""
