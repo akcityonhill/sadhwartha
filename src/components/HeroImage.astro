@@ -1,0 +1,21 @@
+---
+const {
+  image,
+  alt,
+  type = "article",
+  class: className = "",
+} = Astro.props;
+
+const fallback =
+  type === "news"
+    ? "/default-news-hero.jpg"
+    : "/default-article-hero.jpg";
+
+const src = image?.src ?? fallback;
+---
+
+<img
+  src={src}
+  alt={alt}
+  class={className}
+/>
