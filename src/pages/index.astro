@@ -212,10 +212,7 @@ const LANG_LABELS: Record<string, string> = {
     <!-- ── HOME LAYOUT: LEFT SIDEBAR | MAIN | RIGHT SIDEBAR ─ -->
     <section class="home-layout">
       <div class="home-sidebar home-sidebar-left">
-        <ArticlesByLanguageSidebar
-          articles={allArticles}
-          title="Articles"
-        />
+        <ArticlesByLanguageSidebar articles={allArticles} title="Articles" />
       </div>
 
       <div class="home-main">
@@ -724,29 +721,6 @@ const LANG_LABELS: Record<string, string> = {
     right: 16px;
   }
 
-  /* ── TABLET (768px to 1024px) ────────────────── */
-  @media (max-width: 1024px) {
-    .carousel {
-      height: 350px;
-    }
-
-    .carousel-content {
-      bottom: 30px;
-      left: 30px;
-      right: 30px;
-    }
-
-    .carousel-title {
-      font-size: 22px;
-      margin-bottom: 6px;
-    }
-
-    .carousel-desc {
-      font-size: 12px;
-      -webkit-line-clamp: 2;
-    }
-  }
-
   .btn-primary {
     padding: 10px 24px;
     background: var(--red);
@@ -941,7 +915,7 @@ const LANG_LABELS: Record<string, string> = {
 
   .ql-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
   }
 
@@ -996,6 +970,11 @@ const LANG_LABELS: Record<string, string> = {
     .carousel-title {
       font-size: 22px;
       margin-bottom: 6px;
+    }
+
+    .carousel-desc {
+      font-size: 12px;
+      -webkit-line-clamp: 2;
     }
 
     .carousel-welcome {
@@ -1236,7 +1215,20 @@ const LANG_LABELS: Record<string, string> = {
     }
 
     .ql-grid {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .ql-card {
+      padding: 12px 8px;
+    }
+
+    .ql-icon {
+      font-size: 20px;
+    }
+
+    .ql-label {
+      font-size: 12px;
     }
 
     .footer {
