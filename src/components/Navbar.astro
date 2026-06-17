@@ -39,32 +39,32 @@
   <div class="nav-right">
     <div class="nav-links" id="navLinks" role="navigation">
       <a href="/" class="nav-link" data-active={Astro.url.pathname === "/"}
-        >Home</a
+        >HOME</a
       >
       <a
         href="/blog"
         class="nav-link"
-        data-active={Astro.url.pathname.startsWith("/blog")}>Articles</a
+        data-active={Astro.url.pathname.startsWith("/blog")}>ARTICLES</a
       >
       <a
         href="/news"
         class="nav-link"
-        data-active={Astro.url.pathname.startsWith("/news")}>News</a
+        data-active={Astro.url.pathname.startsWith("/news")}>NEWS</a
       >
       <a
         href="/archive"
         class="nav-link"
-        data-active={Astro.url.pathname.startsWith("/archive")}>Archive</a
+        data-active={Astro.url.pathname.startsWith("/archive")}>ARCHIVE</a
       >
       <a
         href="/about"
         class="nav-link"
-        data-active={Astro.url.pathname.startsWith("/about")}>About</a
+        data-active={Astro.url.pathname.startsWith("/about")}>ABOUT</a
       >
       <a
         href="/contact"
         class="nav-link"
-        data-active={Astro.url.pathname.startsWith("/contact")}>Contact</a
+        data-active={Astro.url.pathname.startsWith("/contact")}>CONTACT</a
       >
     </div>
     <button
@@ -164,7 +164,7 @@
     transform: translate(-50%, -50%);
     min-width: 0;
     padding: 4px;
-    padding-left: 650px;
+    padding-left: 740px;
     margin: -4px;
   }
 
@@ -177,24 +177,24 @@
   }
 
   .center-img-ml {
-    height: 32px;
+    height: 40px;
     width: auto;
-      filter: brightness(0) saturate(100%) invert(27%) sepia(30%) saturate(1894%) hue-rotate(204deg) brightness(92%) contrast(92%);
+    filter: brightness(0) saturate(100%) invert(10%) sepia(30%) saturate(1894%) hue-rotate(204deg) brightness(92%) contrast(92%);
   }
 
   .center-img-cog {
     height: 38px;
     width: auto;
     opacity: 0.8;
-     filter: brightness(0) saturate(100%) invert(32%) sepia(21%) saturate(1304%) hue-rotate(343deg) brightness(95%) contrast(89%);
+    filter: brightness(0) saturate(100%) invert(32%) sepia(21%) saturate(2004%) hue-rotate(343deg) brightness(95%) contrast(89%);
   }
 
   .center-img-en {
-    height: 24px;
+    height: 28px;
     width: auto;
-    transform: translateY(5.5px) scaleY(0.85);
+    transform: translateY(7.5px) scaleY(0.85);
     transform-origin: top;
-      filter: brightness(0) saturate(100%) invert(27%) sepia(30%) saturate(1894%) hue-rotate(204deg) brightness(92%) contrast(92%);
+    filter: brightness(0) saturate(100%) invert(10%) sepia(30%) saturate(1894%) hue-rotate(204deg) brightness(92%) contrast(92%);
   }
 
   /* ── RIGHT SECTION: LINKS & TOGGLE ────────────────────────── */
@@ -265,6 +265,7 @@
 
 .nav-link[data-active="true"] {
   color: var(--red);
+  font-weight: 700;-
 }
 
   /* ── HAMBURGER MENU TOGGLE ────────────────────────────────── */
