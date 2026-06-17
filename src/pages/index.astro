@@ -2,6 +2,8 @@
 import BaseHead from "../components/BaseHead.astro";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
+import ArticlesByLanguageSidebar from "../components/ArticlesByLanguageSidebar.astro";
+import NewsByLanguageSidebar from "../components/NewsByLanguageSidebar.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 import { getCollection } from "astro:content";
 
@@ -207,132 +209,143 @@ const LANG_LABELS: Record<string, string> = {
       </div>
     </section>
 
-    <!-- ── RECENT ARTICLES ───────────────────────── -->
-    <section class="section">
-      <div class="section-wrap">
-        <div class="section-header">
-          <h2 class="section-title">Recent Articles</h2>
-          <a href="/blog" class="section-more">View all →</a>
-        </div>
-
-        <div class="articles-grid">
-          {
-            recentArticles.map((article) => (
-              <a href={`/blog/${article.id}`} class="article-card">
-                <div class="card-img-wrap">
-                  {article.data.heroImage ? (
-                    <img
-                      src={article.data.heroImage.src}
-                      alt={article.data.title}
-                      class="card-img"
-                    />
-                  ) : (
-                    <div class="card-img-placeholder">✝</div>
-                  )}
-                </div>
-                <div class="card-body">
-                  <div class="card-meta">
-                    {/* <span class="card-lang">{LANG_LABELS[article.data.language] ?? article.data.language}</span> */}
-                    <span class="card-date">
-                      {new Date(article.data.pubDate).toLocaleDateString(
-                        "en-IN",
-                        {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        },
-                      )}
-                    </span>
-                  </div>
-                  <div class="card-title">{article.data.title}</div>
-                  <div class="card-desc">{article.data.description}</div>
-                  {/* <div><h5>{article.data.author}</h5></div> */}
-                </div>
-              </a>
-            ))
-          }
-        </div>
+    <!-- ── HOME LAYOUT: LEFT SIDEBAR | MAIN | RIGHT SIDEBAR ─ -->
+    <section class="home-layout">
+      <div class="home-sidebar home-sidebar-left">
+        <ArticlesByLanguageSidebar
+          articles={allArticles}
+          title="Articles"
+        />
       </div>
-    </section>
 
-    <section class="section">
-      <div class="section-wrap">
-        <div class="section-header">
-          <h2 class="section-title">Recent News</h2>
-          <a href="/news" class="section-more">View all →</a>
+      <div class="home-main">
+        <!-- ── RECENT ARTICLES ───────────────────────── -->
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">Recent Articles</h2>
+            <a href="/blog" class="section-more">View all →</a>
+          </div>
+
+          <div class="articles-grid">
+            {
+              recentArticles.map((article) => (
+                <a href={`/blog/${article.id}`} class="article-card">
+                  <div class="card-img-wrap">
+                    {article.data.heroImage ? (
+                      <img
+                        src={article.data.heroImage.src}
+                        alt={article.data.title}
+                        class="card-img"
+                      />
+                    ) : (
+                      <div class="card-img-placeholder">✝</div>
+                    )}
+                  </div>
+                  <div class="card-body">
+                    <div class="card-meta">
+                      {/* <span class="card-lang">{LANG_LABELS[article.data.language] ?? article.data.language}</span> */}
+                      <span class="card-date">
+                        {new Date(article.data.pubDate).toLocaleDateString(
+                          "en-IN",
+                          {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          },
+                        )}
+                      </span>
+                    </div>
+                    <div class="card-title">{article.data.title}</div>
+                    <div class="card-desc">{article.data.description}</div>
+                    {/* <div><h5>{article.data.author}</h5></div> */}
+                  </div>
+                </a>
+              ))
+            }
+          </div>
         </div>
 
-        <div class="articles-grid">
-          {
-            recentNews.map((newsItem) => (
-              <a href={`/news/${newsItem.id}`} class="article-card">
-                <div class="card-img-wrap">
-                  {newsItem.data.heroImage ? (
-                    <img
-                      src={newsItem.data.heroImage.src}
-                      alt={newsItem.data.title}
-                      class="card-img"
-                    />
-                  ) : (
-                    <div class="card-img-placeholder">📰</div>
-                  )}
-                </div>
+        <!-- ── RECENT NEWS ────────────────────────────── -->
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">Recent News</h2>
+            <a href="/news" class="section-more">View all →</a>
+          </div>
 
-                <div class="card-body">
-                  <div class="card-meta">
-                    <span class="card-date">
-                      {new Date(newsItem.data.pubDate).toLocaleDateString(
-                        "en-IN",
-                        {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        },
-                      )}
-                    </span>
+          <div class="articles-grid">
+            {
+              recentNews.map((newsItem) => (
+                <a href={`/news/${newsItem.id}`} class="article-card">
+                  <div class="card-img-wrap">
+                    {newsItem.data.heroImage ? (
+                      <img
+                        src={newsItem.data.heroImage.src}
+                        alt={newsItem.data.title}
+                        class="card-img"
+                      />
+                    ) : (
+                      <div class="card-img-placeholder">📰</div>
+                    )}
                   </div>
 
-                  <div class="card-title">{newsItem.data.title}</div>
+                  <div class="card-body">
+                    <div class="card-meta">
+                      <span class="card-date">
+                        {new Date(newsItem.data.pubDate).toLocaleDateString(
+                          "en-IN",
+                          {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          },
+                        )}
+                      </span>
+                    </div>
 
-                  <div class="card-desc">{newsItem.data.description}</div>
-                </div>
-              </a>
-            ))
-          }
+                    <div class="card-title">{newsItem.data.title}</div>
+
+                    <div class="card-desc">{newsItem.data.description}</div>
+                  </div>
+                </a>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- ── QUICK LINKS ───────────────────────────── -->
+        <div class="quicklinks">
+          <div class="ql-grid">
+            <a href="/blog?lang=ml" class="ql-card">
+              <div class="ql-icon">മ</div>
+              <div class="ql-label">മലയാളം</div>
+              <div class="ql-sub">Malayalam Articles</div>
+            </a>
+            <a href="/blog?lang=hi" class="ql-card">
+              <div class="ql-icon">हि</div>
+              <div class="ql-label">हिंदी</div>
+              <div class="ql-sub">Hindi Articles</div>
+            </a>
+            <a href="/blog?lang=en" class="ql-card">
+              <div class="ql-icon">En</div>
+              <div class="ql-label">English</div>
+              <div class="ql-sub">English Articles</div>
+            </a>
+            <a href="/contact" class="ql-card">
+              <div class="ql-icon">✉</div>
+              <div class="ql-label">Contact</div>
+              <div class="ql-sub">Get in touch</div>
+            </a>
+            <a href="/archive" class="ql-card">
+              <div class="ql-icon">lll</div>
+              <div class="ql-label">Archive</div>
+              <div class="ql-sub">Previous Editions</div>
+            </a>
+          </div>
         </div>
       </div>
-    </section>
 
-    <!-- ── QUICK LINKS ───────────────────────────── -->
-    <section class="quicklinks">
-      <div class="section-wrap">
-        <div class="ql-grid">
-          <a href="/blog?lang=ml" class="ql-card">
-            <div class="ql-icon">മ</div>
-            <div class="ql-label">മലയാളം</div>
-            <div class="ql-sub">Malayalam Articles</div>
-          </a>
-          <a href="/blog?lang=hi" class="ql-card">
-            <div class="ql-icon">हि</div>
-            <div class="ql-label">हिंदी</div>
-            <div class="ql-sub">Hindi Articles</div>
-          </a>
-          <a href="/blog?lang=en" class="ql-card">
-            <div class="ql-icon">En</div>
-            <div class="ql-label">English</div>
-            <div class="ql-sub">English Articles</div>
-          </a>
-          <a href="/contact" class="ql-card">
-            <div class="ql-icon">✉</div>
-            <div class="ql-label">Contact</div>
-            <div class="ql-sub">Get in touch</div>
-          </a>
-          <a href="/archive" class="ql-card">
-            <div class="ql-icon">lll</div>
-            <div class="ql-label">Archive</div>
-            <div class="ql-sub">Previous Editions</div>
-          </a>
-        </div>
+      <div class="home-sidebar home-sidebar-right">
+        <NewsByLanguageSidebar newsItems={allNews} title="News" />
       </div>
     </section>
 
@@ -768,14 +781,33 @@ const LANG_LABELS: Record<string, string> = {
     color: var(--red);
   }
 
-  /* ── SECTIONS ────────────────────────────────── */
-  .section {
-    padding: 48px 32px;
+  /* ── HOME LAYOUT (LEFT | MAIN | RIGHT) ───────── */
+  .home-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr 280px;
+    gap: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px 32px 0;
+    align-items: start;
   }
 
-  .section-wrap {
-    max-width: 1100px;
-    margin: 0 auto;
+  .home-sidebar-left {
+    order: 1;
+  }
+
+  .home-main {
+    order: 2;
+    min-width: 0;
+  }
+
+  .home-sidebar-right {
+    order: 3;
+  }
+
+  /* ── SECTIONS (now nested inside .home-main) ── */
+  .section {
+    padding: 0 0 40px;
   }
 
   .section-header {
@@ -805,7 +837,7 @@ const LANG_LABELS: Record<string, string> = {
   /* ── ARTICLES GRID ───────────────────────────── */
   .articles-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 16px;
   }
 
@@ -904,15 +936,13 @@ const LANG_LABELS: Record<string, string> = {
 
   /* ── QUICK LINKS ─────────────────────────────── */
   .quicklinks {
-    padding: 0 32px 48px;
+    padding: 0 0 8px;
   }
 
   .ql-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 12px;
-    max-width: 1100px;
-    margin: 0 auto;
   }
 
   .ql-card {
@@ -1006,6 +1036,24 @@ const LANG_LABELS: Record<string, string> = {
 
     .nav-link {
       font-size: 13px; /* Smaller text */
+    }
+
+    /* Stack: main content first, then left sidebar, then right sidebar */
+    .home-layout {
+      grid-template-columns: 1fr;
+      padding: 24px 16px 0;
+    }
+
+    .home-main {
+      order: 1;
+    }
+
+    .home-sidebar-left {
+      order: 2;
+    }
+
+    .home-sidebar-right {
+      order: 3;
     }
   }
 
@@ -1182,16 +1230,11 @@ const LANG_LABELS: Record<string, string> = {
       font-size: 14px;
     }
 
-    .section {
-      padding: 32px 16px;
-    }
-    .quicklinks {
-      padding: 0 16px 32px;
+    .home-layout {
+      padding: 16px 12px 0;
+      gap: 16px;
     }
 
-    .articles-grid {
-      grid-template-columns: 1fr;
-    }
     .ql-grid {
       grid-template-columns: repeat(2, 1fr);
     }

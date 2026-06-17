@@ -2,6 +2,7 @@
 import BaseHead from "../../components/BaseHead.astro";
 import Navbar from "../../components/Navbar.astro";
 import Footer from "../../components/Footer.astro";
+import ArticlesByLanguageSidebar from "../../components/ArticlesByLanguageSidebar.astro";
 import { SITE_TITLE } from "../../consts";
 import { getCollection } from "astro:content";
 
@@ -45,84 +46,100 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     <Navbar />
 
     <div class="page-wrap">
-      <div class="page-header">
-        <div class="page-title">Articles</div>
-        <div class="page-sub">Publications in English, Malayalam and Hindi</div>
-      </div>
+      <div class="blog-layout">
+        <div class="blog-sidebar">
+          <ArticlesByLanguageSidebar
+            articles={allArticles}
+            title="All Articles"
+          />
+        </div>
 
-      <!-- Language tabs -->
-      <div class="lang-tabs">
-        {
-          activeLangs.map((lang, i) => (
-            <a
-              href={`#lang-${lang}`}
-              class={`lang-tab ${i === 0 ? "active" : ""}`}
-            >
-              <span class="tab-native">{LANGUAGES[lang].nativeLabel}</span>
-              <span class="tab-count">{grouped[lang].length}</span>
-            </a>
-          ))
-        }
-      </div>
-
-      <!-- Articles grouped by language -->
-      {
-        activeLangs.map((lang) => (
-          <div class="lang-section" id={`lang-${lang}`}>
-            <div class="lang-header">
-              <span class="lang-native">{LANGUAGES[lang].nativeLabel}</span>
-              {lang !== "en" && (
-                <span class="lang-english">{LANGUAGES[lang].label}</span>
-              )}
-            </div>
-
-            <div class="articles-list">
-              {grouped[lang].map((article) => {
-                // Build the English version URL if translation slug is provided
-                const enSlug = article.data.translations?.en;
-                const enUrl = enSlug ? `/blog/en/${enSlug}` : null;
-
-                return (
-                  <div class="article-card">
-                    <a href={`/blog/${article.id}`} class="article-link">
-                      {article.data.heroImage && (
-                        <img
-                          src={article.data.heroImage.src}
-                          alt={article.data.title}
-                          class="article-thumb"
-                        />
-                      )}
-                      <div class="article-body">
-                        <span class="article-date">
-                          {new Date(article.data.pubDate).toLocaleDateString(
-                            "en-IN",
-                            {
-                              day: "numeric",
-                              month: "long",
-                              year: "numeric",
-                            },
-                          )}
-                        </span>
-                        <div class="article-title">{article.data.title}</div>
-                        <div class="article-desc">
-                          {article.data.description}
-                        </div>
-                      </div>
-                    </a>
-                    {lang !== "en" && enUrl && (
-                      <div class="en-version-bar">
-                        <a href={enUrl} class="en-version-link">
-                          View English version →
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+        <div class="blog-main">
+          <div class="page-header">
+            <div class="page-title">Articles</div>
+            <div class="page-sub">
+              Publications in English, Malayalam and Hindi
             </div>
           </div>
-        ))
-      }
+
+          <!-- Language tabs -->
+          <div class="lang-tabs">
+            {
+              activeLangs.map((lang, i) => (
+                <a
+                  href={`#lang-${lang}`}
+                  class={`lang-tab ${i === 0 ? "active" : ""}`}
+                >
+                  <span class="tab-native">{LANGUAGES[lang].nativeLabel}</span>
+                  <span class="tab-count">{grouped[lang].length}</span>
+                </a>
+              ))
+            }
+          </div>
+
+          <!-- Articles grouped by language -->
+          {
+            activeLangs.map((lang) => (
+              <div class="lang-section" id={`lang-${lang}`}>
+                <div class="lang-header">
+                  <span class="lang-native">
+                    {LANGUAGES[lang].nativeLabel}
+                  </span>
+                  {lang !== "en" && (
+                    <span class="lang-english">{LANGUAGES[lang].label}</span>
+                  )}
+                </div>
+
+                <div class="articles-list">
+                  {grouped[lang].map((article) => {
+                    // Build the English version URL if translation slug is provided
+                    const enSlug = article.data.translations?.en;
+                    const enUrl = enSlug ? `/blog/en/${enSlug}` : null;
+
+                    return (
+                      <div class="article-card">
+                        <a href={`/blog/${article.id}`} class="article-link">
+                          {article.data.heroImage && (
+                            <img
+                              src={article.data.heroImage.src}
+                              alt={article.data.title}
+                              class="article-thumb"
+                            />
+                          )}
+                          <div class="article-body">
+                            <span class="article-date">
+                              {new Date(
+                                article.data.pubDate,
+                              ).toLocaleDateString("en-IN", {
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                              })}
+                            </span>
+                            <div class="article-title">
+                              {article.data.title}
+                            </div>
+                            <div class="article-desc">
+                              {article.data.description}
+                            </div>
+                          </div>
+                        </a>
+                        {lang !== "en" && enUrl && (
+                          <div class="en-version-bar">
+                            <a href={enUrl} class="en-version-link">
+                              View English version →
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
     </div>
 
     <Footer />
@@ -148,9 +165,27 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
   .page-wrap {
     flex: 1;
     padding: 0px 16px;
-    max-width: 860px;
+    max-width: 1160px;
     margin: 0 auto;
     width: 100%;
+  }
+
+  /* ── BLOG LAYOUT (LEFT SIDEBAR | MAIN) ───────── */
+  .blog-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .blog-sidebar {
+    order: 1;
+    margin-top: 2rem;
+  }
+
+  .blog-main {
+    order: 2;
+    min-width: 0;
   }
 
   /* ── PAGE HEADER ─────────────────────────────── */
@@ -320,6 +355,23 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
   }
 
   /* ── TABLET ──────────────────────────────────── */
+  @media (max-width: 1024px) {
+    /* Stack: main content first, then sidebar below it */
+    .blog-layout {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .blog-main {
+      order: 1;
+    }
+
+    .blog-sidebar {
+      order: 2;
+      margin-top: 0;
+    }
+  }
+
   @media (max-width: 768px) {
     body {
       padding-top: 45px;

@@ -1,0 +1,369 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  articles: CollectionEntry<"blog">[];
+  title?: string;
+}
+
+const { articles, title = "Articles by Language" } = Astro.props;
+
+const LANG_LABELS: Record<string, string> = {
+  en: "English",
+  ml: "മലയാളം",
+  hi: "हिंदी",
+};
+
+const langOrder = ["en", "ml", "hi"];
+
+const sorted = [...articles].sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+const grouped = sorted.reduce(
+  (acc, article) => {
+    const lang = article.data.language;
+    if (!acc[lang]) acc[lang] = [];
+    acc[lang].push(article);
+    return acc;
+  },
+  {} as Record<string, typeof sorted>,
+);
+
+const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
+
+const searchData = sorted.map((article) => ({
+  id: article.id,
+  title: article.data.title,
+  description: article.data.description ?? "",
+  lang: article.data.language,
+  url: `/blog/${article.id}`,
+}));
+---
+
+<aside class="side-panel">
+  <div class="side-panel-header">{title}</div>
+
+  <div class="side-search-wrap">
+    <div class="side-search-inner">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/>
+        <line x1="16.5" y1="16.5" x2="22" y2="22"/>
+      </svg>
+      <input
+        id="sidebar-search"
+        type="text"
+        placeholder="Search articles…"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button id="sidebar-search-clear" class="clear-btn" aria-label="Clear search" hidden>✕</button>
+    </div>
+  </div>
+
+  <div class="side-panel-body" id="sidebar-grouped">
+    {
+      activeLangs.map((lang) => (
+        <div class="side-lang-group">
+          <div class="side-lang-title">
+            <span>{LANG_LABELS[lang] ?? lang}</span>
+            <span class="side-lang-count">{grouped[lang].length}</span>
+          </div>
+          <ul class="side-list">
+            {grouped[lang].map((article) => (
+              <li>
+                <a href={`/blog/${article.id}`} class="side-link">
+                  {article.data.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="side-panel-body" id="sidebar-results" hidden>
+    <div id="sidebar-results-count" class="results-count"></div>
+    <div id="sidebar-results-list" class="results-list"></div>
+    <div id="sidebar-no-results" class="no-results" hidden>No articles found.</div>
+  </div>
+</aside>
+
+<script define:vars={{ searchData }}>
+  const input = document.getElementById("sidebar-search");
+  const clearBtn = document.getElementById("sidebar-search-clear");
+  const groupedPane = document.getElementById("sidebar-grouped");
+  const resultsPane = document.getElementById("sidebar-results");
+  const resultsList = document.getElementById("sidebar-results-list");
+  const resultsCount = document.getElementById("sidebar-results-count");
+  const noResults = document.getElementById("sidebar-no-results");
+
+  function escapeRe(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function highlight(text, query) {
+    if (!query) return text;
+    const q = query.trim();
+    if (!q) return text;
+    
+    // Split text into words, wrap any word that contains the query
+    return text.replace(/\S+/gu, (word) => {
+      if (word.toLowerCase().includes(q.toLowerCase())) {
+        return `<mark>${word}</mark>`;
+      }
+      return word;
+    });
+  }
+
+  function runSearch(raw) {
+    const q = raw.trim().toLowerCase();
+
+    if (!q) {
+      groupedPane.hidden = false;
+      resultsPane.hidden = true;
+      clearBtn.hidden = true;
+      return;
+    }
+
+    clearBtn.hidden = false;
+    groupedPane.hidden = true;
+    resultsPane.hidden = false;
+
+    const hits = searchData.filter((a) =>
+      a.title.toLowerCase().includes(q)
+    );
+
+    resultsList.innerHTML = "";
+    noResults.hidden = hits.length > 0;
+    resultsCount.textContent =
+      hits.length > 0
+        ? `${hits.length} result${hits.length !== 1 ? "s" : ""}`
+        : "";
+
+    hits.forEach((article) => {
+      const card = document.createElement("a");
+      card.href = article.url;
+      card.className = "sidebar-result-card";
+      card.innerHTML = `<span class="sidebar-result-title">${highlight(article.title, raw.trim())}</span>`;
+      resultsList.appendChild(card);
+    });
+  }
+
+  input.addEventListener("input", (e) => runSearch(e.target.value));
+  clearBtn.addEventListener("click", () => {
+    input.value = "";
+    input.focus();
+    runSearch("");
+  });
+</script>
+
+<!-- Scoped styles for static elements -->
+<style>
+  .side-panel {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    position: sticky;
+    top: calc(var(--navbar-height) + 16px);
+    max-height: calc(100vh - var(--navbar-height) - 32px);
+    overflow-y: auto;
+  }
+
+  .side-panel-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--bg-white);
+    border-radius: 12px 12px 0 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    padding: 16px 20px;
+    border-bottom: 2px solid var(--red);
+  }
+
+  .side-search-wrap {
+    padding: 12px 16px 8px;
+    position: sticky;
+    top: 51px;
+    z-index: 1;
+    background: var(--bg-white);
+  }
+
+  .side-search-inner {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--bg-page);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 10px;
+    transition: border-color 0.15s;
+  }
+
+  .side-search-inner:focus-within {
+    border-color: var(--red);
+    background: var(--bg-white);
+  }
+
+  .search-icon {
+    flex-shrink: 0;
+    color: var(--text-muted);
+  }
+
+  #sidebar-search {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    color: var(--text-primary);
+    outline: none;
+    min-width: 0;
+    font-family: var(--font-body);
+  }
+
+  #sidebar-search::placeholder {
+    color: var(--text-muted);
+  }
+
+  .clear-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 12px;
+    padding: 0 2px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+
+  .clear-btn:hover {
+    color: var(--red);
+  }
+
+  .side-panel-body {
+    padding: 8px 16px 20px;
+  }
+
+  .side-lang-group {
+    margin-bottom: 18px;
+  }
+
+  .side-lang-group:last-child {
+    margin-bottom: 0;
+  }
+
+  .side-lang-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--red);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+  }
+
+  .side-lang-count {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--bg-page);
+    padding: 1px 7px;
+    border-radius: 10px;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .side-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .side-link {
+    display: block;
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    line-height: 1.4;
+  }
+
+  .side-link:hover {
+    color: var(--red);
+  }
+
+  .results-count {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .no-results {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 20px 0 8px;
+  }
+
+  @media (max-width: 1024px) {
+    .side-panel {
+      position: static;
+      max-height: none;
+    }
+    .side-search-wrap {
+      position: static;
+    }
+  }
+</style>
+
+<!-- Global styles for JS-injected result cards -->
+<style is:global>
+  .sidebar-result-card {
+    display: flex;
+    flex-direction: column;
+    padding: 9px 11px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-page);
+    text-decoration: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .sidebar-result-card:hover {
+    border-color: var(--red);
+    background: #fffbf0;
+  }
+
+  .sidebar-result-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  .sidebar-result-card:hover .sidebar-result-title {
+    color: var(--red);
+  }
+
+  .sidebar-result-card mark {
+    background: #fff3a3;
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+</style>
