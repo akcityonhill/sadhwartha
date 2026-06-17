@@ -3,6 +3,12 @@ import BaseHead from "../components/BaseHead.astro";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
 import { SITE_TITLE } from "../consts";
+import ArticlesByLanguageSidebar from "../components/ArticlesByLanguageSidebar.astro";
+import NewsByLanguageSidebar from "../components/NewsByLanguageSidebar.astro";
+import { getCollection } from "astro:content";
+
+const allArticles = await getCollection("blog");
+const allNews = await getCollection("news");
 
 const archive = [
   {
@@ -55,27 +61,67 @@ const archive = [
         <div class="page-sub">Past publications available as PDF downloads</div>
       </div>
 
-      <div class="archive-wrap">
-        {
-          archive.map((group) => (
-            <div class="year-group">
-              <div class="year-label">{group.year}</div>
-              <div class="month-list">
-                {group.months.map((month) => (
-                  <a href={month.file} target="_blank" class="month-row">
-                    <div class="month-left">
-                      <span class="month-icon">↓</span>
-                      <span class="month-name">
-                        {month.name} {group.year}
-                      </span>
-                    </div>
-                    <span class="pdf-badge">PDF</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-          ))
-        }
+      <div class="archive-layout">
+        <!-- LEFT SIDEBAR -->
+        <div class="blog-sidebar">
+          <div class="sidebar-desktop">
+            <ArticlesByLanguageSidebar
+              articles={allArticles}
+              title="All Articles"
+            />
+          </div>
+
+          <div class="sidebar-accordion">
+            <ArticlesByLanguageSidebar
+              articles={allArticles}
+              title="All Articles"
+              collapsible={true}
+            />
+          </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="archive-main">
+          <div class="archive-wrap">
+            {
+              archive.map((group) => (
+                <div class="year-group">
+                  <div class="year-label">{group.year}</div>
+
+                  <div class="month-list">
+                    {group.months.map((month) => (
+                      <a href={month.file} target="_blank" class="month-row">
+                        <div class="month-left">
+                          <span class="month-icon">↓</span>
+                          <span class="month-name">
+                            {month.name} {group.year}
+                          </span>
+                        </div>
+
+                        <span class="pdf-badge">PDF</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- RIGHT SIDEBAR -->
+        <div class="blog-sidebar-right">
+          <div class="sidebar-desktop">
+            <NewsByLanguageSidebar newsItems={allNews} title="News" />
+          </div>
+
+          <div class="sidebar-accordion">
+            <NewsByLanguageSidebar
+              newsItems={allNews}
+              title="News"
+              collapsible={true}
+            />
+          </div>
+        </div>
       </div>
     </main>
 
@@ -93,31 +139,59 @@ const archive = [
   }
 
   .page-wrap {
-    margin: 1rem;
-    padding: 1.5rem 0 4rem 0;
+    flex: 1;
+    padding: 0 16px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
   }
 
   .page-header {
-    background: var(--slate);
+    background: var(--text-primary);
     border-radius: 12px;
-    padding: 32px 28px;
-    margin-top: 60px;
-    margin-bottom: 2rem;
-    border: 1px solid var(--text-dark);
+    padding: 28px 32px;
+    margin: 6rem 0 1.5rem;
   }
 
   .page-title {
-    font-size: 28px;
-    font-weight: 600;
+    font-size: 26px;
+    font-weight: 700;
     color: var(--red);
-    letter-spacing: 0.04em;
-    margin: 0 0 8px 0;
+    margin-bottom: 4px;
   }
 
   .page-sub {
-    font-size: 14px;
+    font-size: 13px;
     color: var(--text-muted);
-    margin: 0;
+  }
+
+  /* New styles */
+  .archive-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr 260px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .blog-sidebar {
+    order: 1;
+  }
+
+  .archive-main {
+    order: 2;
+    min-width: 0;
+  }
+
+  .blog-sidebar-right {
+    order: 3;
+  }
+
+  .sidebar-accordion {
+    display: none;
+  }
+
+  .sidebar-desktop {
+    display: block;
   }
 
   /* ── ARCHIVE LIST ──────────────────────────────── */
@@ -201,6 +275,38 @@ const archive = [
   }
 
   /* ── RESPONSIVE ────────────────────────────────── */
+  @media (max-width: 1024px) {
+    .archive-layout {
+      grid-template-columns: 1fr 220px;
+      grid-template-rows: auto auto;
+      gap: 16px;
+    }
+
+    .blog-sidebar {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .blog-sidebar-right {
+      grid-column: 2;
+      grid-row: 2;
+      margin-top: 0;
+    }
+
+    .archive-main {
+      grid-column: 1;
+      grid-row: 1 / 3;
+    }
+
+    .sidebar-desktop {
+      display: none;
+    }
+
+    .sidebar-accordion {
+      display: block;
+    }
+  }
+
   @media (max-width: 768px) {
     main {
       padding: 1.5rem 0.75rem;
@@ -214,8 +320,7 @@ const archive = [
 
     .page-header {
       padding: 20px 16px;
-      margin-top: 60px;
-      margin-bottom: 1.5rem;
+      margin: 4rem 0 1.5rem;
     }
 
     .page-title {
@@ -238,10 +343,45 @@ const archive = [
     }
   }
 
+  @media (max-width: 680px) {
+    .archive-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .archive-main {
+      width: 100%;
+      order: 1;
+    }
+
+    .blog-sidebar {
+      width: 100%;
+      order: 2;
+    }
+
+    .blog-sidebar-right {
+      width: 100%;
+      order: 3;
+    }
+
+    .sidebar-desktop {
+      display: none;
+    }
+
+    .sidebar-accordion {
+      display: block;
+    }
+  }
+
   @media (max-width: 480px) {
     .page-wrap {
       max-width: 100%;
       padding: 0rem 1rem;
+    }
+    .page-header {
+      padding: 20px;
+      margin: 4.5rem 0 1.5rem;
     }
   }
 </style>
