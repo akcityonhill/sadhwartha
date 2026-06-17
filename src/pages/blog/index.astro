@@ -3,23 +3,23 @@ import BaseHead from "../../components/BaseHead.astro";
 import Navbar from "../../components/Navbar.astro";
 import Footer from "../../components/Footer.astro";
 import ArticlesByLanguageSidebar from "../../components/ArticlesByLanguageSidebar.astro";
+import NewsByLanguageSidebar from "../../components/NewsByLanguageSidebar.astro";
 import { SITE_TITLE } from "../../consts";
 import { getCollection } from "astro:content";
 
 const allArticles = await getCollection("blog");
+const allNews     = await getCollection("news");
 
 const sorted = allArticles.sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 
-// Language display config
 const LANGUAGES: Record<string, { label: string; nativeLabel: string }> = {
   en: { label: "English", nativeLabel: "English" },
   ml: { label: "Malayalam", nativeLabel: "മലയാളം" },
   hi: { label: "Hindi", nativeLabel: "हिंदी" },
 };
 
-// Group by language
 const grouped = sorted.reduce(
   (acc, article) => {
     const lang = article.data.language;
@@ -30,115 +30,103 @@ const grouped = sorted.reduce(
   {} as Record<string, typeof sorted>,
 );
 
-const langOrder = ["en", "ml", "hi"];
+const langOrder  = ["en", "ml", "hi"];
 const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead
-      title={`Articles | ${SITE_TITLE}`}
-      description="All Sadhwartha articles"
-    />
+    <BaseHead title={`Articles | ${SITE_TITLE}`} description="All Sadhwartha articles" />
   </head>
   <body>
     <Navbar />
 
     <div class="page-wrap">
+      <div class="page-header">
+        <div class="page-title">Articles</div>
+        <div class="page-sub">Publications in English, Malayalam and Hindi</div>
+      </div>    
       <div class="blog-layout">
+
+        <!-- LEFT SIDEBAR: always visible panel on desktop,
+             accordion on tablet & mobile -->
         <div class="blog-sidebar">
-          <ArticlesByLanguageSidebar
-            articles={allArticles}
-            title="All Articles"
-          />
+          <div class="sidebar-desktop">
+            <ArticlesByLanguageSidebar articles={allArticles} title="All Articles" />
+          </div>
+          <div class="sidebar-accordion">
+            <ArticlesByLanguageSidebar articles={allArticles} title="All Articles" collapsible={true} />
+          </div>
         </div>
 
+        <!-- MAIN CONTENT -->
         <div class="blog-main">
-          <div class="page-header">
-            <div class="page-title">Articles</div>
-            <div class="page-sub">
-              Publications in English, Malayalam and Hindi
-            </div>
-          </div>
-
-          <!-- Language tabs -->
           <div class="lang-tabs">
-            {
-              activeLangs.map((lang, i) => (
-                <a
-                  href={`#lang-${lang}`}
-                  class={`lang-tab ${i === 0 ? "active" : ""}`}
-                >
-                  <span class="tab-native">{LANGUAGES[lang].nativeLabel}</span>
-                  <span class="tab-count">{grouped[lang].length}</span>
-                </a>
-              ))
-            }
+            {activeLangs.map((lang, i) => (
+              <a href={`#lang-${lang}`} class={`lang-tab ${i === 0 ? "active" : ""}`}>
+                <span class="tab-native">{LANGUAGES[lang].nativeLabel}</span>
+                <span class="tab-count">{grouped[lang].length}</span>
+              </a>
+            ))}
           </div>
 
-          <!-- Articles grouped by language -->
-          {
-            activeLangs.map((lang) => (
-              <div class="lang-section" id={`lang-${lang}`}>
-                <div class="lang-header">
-                  <span class="lang-native">
-                    {LANGUAGES[lang].nativeLabel}
-                  </span>
-                  {lang !== "en" && (
-                    <span class="lang-english">{LANGUAGES[lang].label}</span>
-                  )}
-                </div>
-
-                <div class="articles-list">
-                  {grouped[lang].map((article) => {
-                    // Build the English version URL if translation slug is provided
-                    const enSlug = article.data.translations?.en;
-                    const enUrl = enSlug ? `/blog/en/${enSlug}` : null;
-
-                    return (
-                      <div class="article-card">
-                        <a href={`/blog/${article.id}`} class="article-link">
-                          {article.data.heroImage && (
-                            <img
-                              src={article.data.heroImage.src}
-                              alt={article.data.title}
-                              class="article-thumb"
-                            />
-                          )}
-                          <div class="article-body">
-                            <span class="article-date">
-                              {new Date(
-                                article.data.pubDate,
-                              ).toLocaleDateString("en-IN", {
-                                day: "numeric",
-                                month: "long",
-                                year: "numeric",
-                              })}
-                            </span>
-                            <div class="article-title">
-                              {article.data.title}
-                            </div>
-                            <div class="article-desc">
-                              {article.data.description}
-                            </div>
-                          </div>
-                        </a>
-                        {lang !== "en" && enUrl && (
-                          <div class="en-version-bar">
-                            <a href={enUrl} class="en-version-link">
-                              View English version →
-                            </a>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+          {activeLangs.map((lang) => (
+            <div class="lang-section" id={`lang-${lang}`}>
+              <div class="lang-header">
+                <span class="lang-native">{LANGUAGES[lang].nativeLabel}</span>
+                {lang !== "en" && (
+                  <span class="lang-english">{LANGUAGES[lang].label}</span>
+                )}
               </div>
-            ))
-          }
+              <div class="articles-list">
+                {grouped[lang].map((article) => {
+                  const enSlug = article.data.translations?.en;
+                  const enUrl  = enSlug ? `/blog/en/${enSlug}` : null;
+                  return (
+                    <div class="article-card">
+                      <a href={`/blog/${article.id}`} class="article-link">
+                        {article.data.heroImage && (
+                          <img
+                            src={article.data.heroImage.src}
+                            alt={article.data.title}
+                            class="article-thumb"
+                          />
+                        )}
+                        <div class="article-body">
+                          <span class="article-date">
+                            {new Date(article.data.pubDate).toLocaleDateString("en-IN", {
+                              day: "numeric", month: "long", year: "numeric",
+                            })}
+                          </span>
+                          <div class="article-title">{article.data.title}</div>
+                          <div class="article-desc">{article.data.description}</div>
+                        </div>
+                      </a>
+                      {lang !== "en" && enUrl && (
+                        <div class="en-version-bar">
+                          <a href={enUrl} class="en-version-link">View English version →</a>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
+
+        <!-- RIGHT SIDEBAR: always visible panel on desktop,
+             accordion on tablet & mobile -->
+        <div class="blog-sidebar-right">
+          <div class="sidebar-desktop">
+            <NewsByLanguageSidebar newsItems={allNews} title="News" />
+          </div>
+          <div class="sidebar-accordion">
+            <NewsByLanguageSidebar newsItems={allNews} title="News" collapsible={true} />
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -147,9 +135,7 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
 </html>
 
 <style>
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
 
   body {
     background: var(--bg-page);
@@ -161,32 +147,29 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     min-height: 100vh;
   }
 
-  /* ── PAGE WRAPPER ────────────────────────────── */
   .page-wrap {
     flex: 1;
-    padding: 0px 16px;
-    max-width: 1160px;
+    padding: 0 16px;
+    max-width: 1400px;
     margin: 0 auto;
     width: 100%;
   }
 
-  /* ── BLOG LAYOUT (LEFT SIDEBAR | MAIN) ───────── */
+  /* ── DESKTOP: 3 columns ──────────────────────── */
   .blog-layout {
     display: grid;
-    grid-template-columns: 260px 1fr;
+    grid-template-columns: 260px 1fr 260px;
     gap: 24px;
     align-items: start;
   }
 
-  .blog-sidebar {
-    order: 1;
-    margin-top: 2rem;
-  }
+  .blog-sidebar       { order: 1; margin-top: 2rem; }
+  .blog-main          { order: 2; min-width: 0; padding-top: 1.5rem;}
+  .blog-sidebar-right { order: 3; margin-top: 2rem; }
 
-  .blog-main {
-    order: 2;
-    min-width: 0;
-  }
+  /* show panel, hide accordion on desktop */
+  .sidebar-accordion { display: none; }
+  .sidebar-desktop   { display: block; }
 
   /* ── PAGE HEADER ─────────────────────────────── */
   .page-header {
@@ -195,24 +178,15 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     padding: 28px 32px;
     margin: 2rem 0 1.5rem;
   }
-
-  .page-title {
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--red);
-    margin-bottom: 4px;
-  }
-
-  .page-sub {
-    font-size: 13px;
-    color: var(--text-muted);
-  }
+  .page-title { font-size: 26px; font-weight: 700; color: var(--red); margin-bottom: 4px; }
+  .page-sub   { font-size: 13px; color: var(--text-muted); }
 
   /* ── LANGUAGE TABS ───────────────────────────── */
   .lang-tabs {
     display: flex;
     gap: 8px;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;  /* was 2rem */
+    margin-top: 0;
     flex-wrap: wrap;
   }
 
@@ -229,13 +203,8 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     font-size: 13px;
     transition: all 0.15s;
   }
-
   .lang-tab:hover,
-  .lang-tab.active {
-    border-color: var(--red);
-    background: #fffbf0;
-    color: var(--red);
-  }
+  .lang-tab.active { border-color: var(--red); background: #fffbf0; color: var(--red); }
 
   .tab-count {
     font-size: 11px;
@@ -245,10 +214,8 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     border-radius: 10px;
   }
 
-  /* ── LANGUAGE SECTION ────────────────────────── */
-  .lang-section {
-    margin-bottom: 2.5rem;
-  }
+  /* ── LANGUAGE SECTIONS ───────────────────────── */
+  .lang-section { margin-bottom: 2.5rem; }
 
   .lang-header {
     display: flex;
@@ -258,24 +225,11 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     margin-bottom: 16px;
     border-bottom: 2px solid var(--red);
   }
-
-  .lang-native {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text-primary);
-  }
-
-  .lang-english {
-    font-size: 12px;
-    color: var(--text-muted);
-  }
+  .lang-native  { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+  .lang-english { font-size: 12px; color: var(--text-muted); }
 
   /* ── ARTICLE CARDS ───────────────────────────── */
-  .articles-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+  .articles-list { display: flex; flex-direction: column; gap: 12px; }
 
   .article-card {
     background: var(--bg-white);
@@ -284,10 +238,7 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     overflow: hidden;
     transition: box-shadow 0.15s;
   }
-
-  .article-card:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
-  }
+  .article-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
 
   .article-link {
     display: flex;
@@ -307,9 +258,7 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     background: var(--bg-page);
   }
 
-  .article-body {
-    flex: 1;
-  }
+  .article-body { flex: 1; }
 
   .article-date {
     display: block;
@@ -325,83 +274,65 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     margin-bottom: 4px;
     line-height: 1.35;
   }
+  .article-card:hover .article-title { color: var(--red); }
 
-  .article-card:hover .article-title {
-    color: var(--red);
-  }
+  .article-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
 
-  .article-desc {
-    font-size: 13px;
-    color: var(--text-secondary);
-    line-height: 1.5;
-  }
-
-  /* ── ENGLISH VERSION LINK ────────────────────── */
   .en-version-bar {
     border-top: 1px solid var(--border-light);
     padding: 8px 16px;
     background: #fffbf0;
   }
+  .en-version-link { font-size: 12px; color: var(--red); text-decoration: none; font-weight: 500; }
+  .en-version-link:hover { text-decoration: underline; }
 
-  .en-version-link {
-    font-size: 12px;
-    color: var(--red);
-    text-decoration: none;
-    font-weight: 500;
-  }
-
-  .en-version-link:hover {
-    text-decoration: underline;
-  }
-
-  /* ── TABLET ──────────────────────────────────── */
+  /* ── TABLET: 2 columns, right sidebar becomes accordion below main ── */
   @media (max-width: 1024px) {
-    /* Stack: main content first, then sidebar below it */
     .blog-layout {
-      grid-template-columns: 1fr;
+      grid-template-columns: 220px 1fr;  /* slightly narrower sidebar */
+      grid-template-rows: auto auto;
       gap: 16px;
     }
-
-    .blog-main {
-      order: 1;
-    }
-
     .blog-sidebar {
-      order: 2;
+      grid-column: 1;
+      grid-row: 1 / 3;
+      margin-top: 2rem;
+    }
+    .blog-main {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .blog-sidebar-right {
+      grid-column: 2;
+      grid-row: 2;
       margin-top: 0;
     }
+    .sidebar-desktop   { display: none; }
+    .sidebar-accordion { display: block; }
   }
 
-  @media (max-width: 768px) {
-    body {
-      padding-top: 45px;
-    }
-    .page-wrap {
-      padding: 0rem 1rem 0rem;
-    }
-    .page-header {
-      padding: 20px;
-      margin: 1.5rem 0 1rem;
-    }
-    .article-link {
+  /* ── MOBILE: single column, both sidebars as accordions ── */
+  @media (max-width: 680px) {
+    .blog-layout {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
       gap: 12px;
     }
+
+    .blog-main          { order: 1; }
+    .blog-sidebar       { order: 2; margin-top: 0; }
+    .blog-sidebar-right { order: 3; margin-top: 0; }
+
+    .sidebar-desktop   { display: none; }
+    .sidebar-accordion { display: block; }
+
+    .page-wrap { padding: 0 12px; }
+    .page-header { padding: 20px; margin: 1rem 0; }
+    .article-link { gap: 12px; }
+    .article-thumb { width: 90px; height: 68px; }
   }
 
-  /* ── MOBILE ──────────────────────────────────── */
   @media (max-width: 480px) {
-    body {
-      padding-top: 45px;
-    }
-    .page-wrap {
-      padding: 0rem 1rem 0rem;
-    }
-    .page-header {
-      padding: 20px;
-      margin: 1.5rem 0 1rem;
-    }
-    .article-link {
-      gap: 12px;
-    }
+    body { padding-top: 45px; }
   }
 </style>
