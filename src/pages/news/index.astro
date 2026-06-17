@@ -30,14 +30,17 @@ const grouped = sorted.reduce(
   {} as Record<string, CollectionEntry<"news">[]>,
 );
 
-const langOrder   = ["en", "ml", "hi"];
+const langOrder = ["en", "ml", "hi"];
 const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={`News | ${SITE_TITLE}`} description="All Sadhwartha news" />
+    <BaseHead
+      title={`News | ${SITE_TITLE}`}
+      description="All Sadhwartha news"
+    />
   </head>
   <body>
     <Navbar />
@@ -48,7 +51,6 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
         <div class="page-sub">Updates in English, Malayalam and Hindi</div>
       </div>
       <div class="news-layout">
-
         <!-- LEFT SIDEBAR: news index on desktop,
              accordion on tablet & mobile -->
         <div class="news-sidebar">
@@ -56,78 +58,104 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
             <NewsByLanguageSidebar newsItems={allNews} title="All News" />
           </div>
           <div class="sidebar-accordion">
-            <NewsByLanguageSidebar newsItems={allNews} title="All News" collapsible={true} />
+            <NewsByLanguageSidebar
+              newsItems={allNews}
+              title="All News"
+              collapsible={true}
+            />
           </div>
         </div>
 
         <!-- MAIN CONTENT -->
         <div class="news-main">
-
           <div class="lang-tabs">
-            {activeLangs.map((lang, i) => (
-              <a href={`#lang-${lang}`} class={`lang-tab ${i === 0 ? "active" : ""}`}>
-                <span class="tab-native">{LANGUAGES[lang].nativeLabel}</span>
-                <span class="tab-count">{grouped[lang].length}</span>
-              </a>
-            ))}
+            {
+              activeLangs.map((lang, i) => (
+                <a
+                  href={`#lang-${lang}`}
+                  class={`lang-tab ${i === 0 ? "active" : ""}`}
+                >
+                  <span class="tab-native">{LANGUAGES[lang].nativeLabel}</span>
+                  <span class="tab-count">{grouped[lang].length}</span>
+                </a>
+              ))
+            }
           </div>
 
-          {activeLangs.map((lang) => (
-            <div class="lang-section" id={`lang-${lang}`}>
-              <div class="lang-header">
-                <span class="lang-native">{LANGUAGES[lang].nativeLabel}</span>
-                {lang !== "en" && (
-                  <span class="lang-english">{LANGUAGES[lang].label}</span>
-                )}
-              </div>
-              <div class="articles-list">
-                {grouped[lang].map((article) => {
-                  const enSlug = article.data.translations?.en;
-                  const enUrl  = enSlug ? `/news/en/${enSlug}` : null;
-                  return (
-                    <div class="article-card">
-                      <a href={`/news/${article.id}`} class="article-link">
-                        {article.data.heroImage && (
-                          <img
-                            src={article.data.heroImage.src}
-                            alt={article.data.title}
-                            class="article-thumb"
-                          />
+          {
+            activeLangs.map((lang) => (
+              <div class="lang-section" id={`lang-${lang}`}>
+                <div class="lang-header">
+                  <span class="lang-native">{LANGUAGES[lang].nativeLabel}</span>
+                  {lang !== "en" && (
+                    <span class="lang-english">{LANGUAGES[lang].label}</span>
+                  )}
+                </div>
+                <div class="articles-list">
+                  {grouped[lang].map((article) => {
+                    const enSlug = article.data.translations?.en;
+                    const enUrl = enSlug ? `/news/en/${enSlug}` : null;
+                    return (
+                      <div class="article-card">
+                        <a href={`/news/${article.id}`} class="article-link">
+                          {article.data.heroImage && (
+                            <img
+                              src={article.data.heroImage.src}
+                              alt={article.data.title}
+                              class="article-thumb"
+                            />
+                          )}
+                          <div class="article-body">
+                            <span class="article-date">
+                              {new Date(
+                                article.data.pubDate,
+                              ).toLocaleDateString("en-IN", {
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                              })}
+                            </span>
+                            <div class="article-title">
+                              {article.data.title}
+                            </div>
+                            <div class="article-desc">
+                              {article.data.description}
+                            </div>
+                          </div>
+                        </a>
+                        {lang !== "en" && enUrl && (
+                          <div class="en-version-bar">
+                            <a href={enUrl} class="en-version-link">
+                              View English version →
+                            </a>
+                          </div>
                         )}
-                        <div class="article-body">
-                          <span class="article-date">
-                            {new Date(article.data.pubDate).toLocaleDateString("en-IN", {
-                              day: "numeric", month: "long", year: "numeric",
-                            })}
-                          </span>
-                          <div class="article-title">{article.data.title}</div>
-                          <div class="article-desc">{article.data.description}</div>
-                        </div>
-                      </a>
-                      {lang !== "en" && enUrl && (
-                        <div class="en-version-bar">
-                          <a href={enUrl} class="en-version-link">View English version →</a>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          }
         </div>
 
         <!-- RIGHT SIDEBAR: articles on desktop,
              accordion on tablet & mobile -->
         <div class="news-sidebar-right">
           <div class="sidebar-desktop">
-            <ArticlesByLanguageSidebar articles={allArticles} title="Articles" />
+            <ArticlesByLanguageSidebar
+              articles={allArticles}
+              title="Articles"
+            />
           </div>
           <div class="sidebar-accordion">
-            <ArticlesByLanguageSidebar articles={allArticles} title="Articles" collapsible={true} />
+            <ArticlesByLanguageSidebar
+              articles={allArticles}
+              title="Articles"
+              collapsible={true}
+            />
           </div>
         </div>
-
       </div>
     </div>
 
@@ -136,7 +164,9 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
 </html>
 
 <style>
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+  }
 
   body {
     background: var(--bg-page);
@@ -164,13 +194,26 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     align-items: start;
   }
 
-  .news-sidebar       { order: 1; margin-top: 2rem; }
-  .news-main          { order: 2; min-width: 0; }
-  .news-sidebar-right { order: 3; margin-top: 2rem; }
+  .news-sidebar {
+    order: 1;
+    margin-top: 2rem;
+  }
+  .news-main {
+    order: 2;
+    min-width: 0;
+  }
+  .news-sidebar-right {
+    order: 3;
+    margin-top: 2rem;
+  }
 
   /* show panel, hide accordion on desktop */
-  .sidebar-accordion { display: none; }
-  .sidebar-desktop   { display: block; }
+  .sidebar-accordion {
+    display: none;
+  }
+  .sidebar-desktop {
+    display: block;
+  }
 
   /* ── PAGE HEADER ─────────────────────────────── */
   .page-header {
@@ -179,8 +222,16 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     padding: 28px 32px;
     margin: 2rem 0 1.5rem;
   }
-  .page-title { font-size: 26px; font-weight: 700; color: var(--red); margin-bottom: 4px; }
-  .page-sub   { font-size: 13px; color: var(--text-muted); }
+  .page-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--red);
+    margin-bottom: 4px;
+  }
+  .page-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
 
   /* ── LANGUAGE TABS ───────────────────────────── */
   .lang-tabs {
@@ -204,7 +255,11 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     transition: all 0.15s;
   }
   .lang-tab:hover,
-  .lang-tab.active { border-color: var(--red); background: #fffbf0; color: var(--red); }
+  .lang-tab.active {
+    border-color: var(--red);
+    background: #fffbf0;
+    color: var(--red);
+  }
 
   .tab-count {
     font-size: 11px;
@@ -215,7 +270,9 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
   }
 
   /* ── LANGUAGE SECTIONS ───────────────────────── */
-  .lang-section { margin-bottom: 2.5rem; }
+  .lang-section {
+    margin-bottom: 2.5rem;
+  }
 
   .lang-header {
     display: flex;
@@ -225,11 +282,22 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     margin-bottom: 16px;
     border-bottom: 2px solid var(--red);
   }
-  .lang-native  { font-size: 20px; font-weight: 700; color: var(--text-primary); }
-  .lang-english { font-size: 12px; color: var(--text-muted); }
+  .lang-native {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .lang-english {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
 
   /* ── ARTICLE CARDS ───────────────────────────── */
-  .articles-list { display: flex; flex-direction: column; gap: 12px; }
+  .articles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
 
   .article-card {
     background: var(--bg-white);
@@ -238,7 +306,9 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     overflow: hidden;
     transition: box-shadow 0.15s;
   }
-  .article-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+  .article-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+  }
 
   .article-link {
     display: flex;
@@ -258,7 +328,9 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     background: var(--bg-page);
   }
 
-  .article-body { flex: 1; }
+  .article-body {
+    flex: 1;
+  }
 
   .article-date {
     display: block;
@@ -274,22 +346,35 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     margin-bottom: 4px;
     line-height: 1.35;
   }
-  .article-card:hover .article-title { color: var(--red); }
+  .article-card:hover .article-title {
+    color: var(--red);
+  }
 
-  .article-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .article-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
 
   .en-version-bar {
     border-top: 1px solid var(--border-light);
     padding: 8px 16px;
     background: #fffbf0;
   }
-  .en-version-link { font-size: 12px; color: var(--red); text-decoration: none; font-weight: 500; }
-  .en-version-link:hover { text-decoration: underline; }
+  .en-version-link {
+    font-size: 12px;
+    color: var(--red);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .en-version-link:hover {
+    text-decoration: underline;
+  }
 
   /* ── TABLET: left sidebar stays, right drops below main ── */
   @media (max-width: 1024px) {
     .news-layout {
-      grid-template-columns: 220px 1fr;  /* slightly narrower sidebar */
+      grid-template-columns: 220px 1fr; /* slightly narrower sidebar */
       grid-template-rows: auto auto;
       gap: 16px;
     }
@@ -307,8 +392,12 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
       grid-row: 2;
       margin-top: 0;
     }
-    .sidebar-desktop   { display: none; }
-    .sidebar-accordion { display: block; }
+    .sidebar-desktop {
+      display: none;
+    }
+    .sidebar-accordion {
+      display: block;
+    }
   }
 
   /* ── MOBILE: single column, all accordions ───── */
@@ -319,20 +408,44 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
       gap: 12px;
     }
 
-    .news-main          { order: 1; }
-    .news-sidebar       { order: 2; margin-top: 0; }
-    .news-sidebar-right { order: 3; margin-top: 0; }
+    .news-main {
+      order: 1;
+    }
+    .news-sidebar {
+      order: 2;
+      margin-top: 0;
+    }
+    .news-sidebar-right {
+      order: 3;
+      margin-top: 0;
+    }
 
-    .sidebar-desktop   { display: none; }
-    .sidebar-accordion { display: block; }
+    .sidebar-desktop {
+      display: none;
+    }
+    .sidebar-accordion {
+      display: block;
+    }
 
-    .page-wrap { padding: 0 12px; }
-    .page-header { padding: 20px; margin: 1rem 0; }
-    .article-link { gap: 12px; }
-    .article-thumb { width: 90px; height: 68px; }
+    .page-wrap {
+      padding: 0 12px;
+    }
+    .page-header {
+      padding: 20px;
+      margin: 1rem 0;
+    }
+    .article-link {
+      gap: 12px;
+    }
+    .article-thumb {
+      width: 90px;
+      height: 68px;
+    }
   }
 
   @media (max-width: 480px) {
-    body { padding-top: 45px; }
+    body {
+      padding-top: 45px;
+    }
   }
 </style>
