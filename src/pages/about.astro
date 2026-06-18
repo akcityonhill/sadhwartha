@@ -37,13 +37,13 @@ const officeBearers = [
     <Navbar />
 
     <div class="page-wrap">
-  <div class="page-header">
-    <div class="page-title">About Sadhwartha</div>
-    <div class="page-sub">
-      Learn about Sadhwartha and meet the leadership of the publication.
+      <div class="page-header">
+        <div class="page-title">About Sadhwartha</div>
+        <div class="page-sub">
+          Learn about Sadhwartha and meet the leadership of the publication.
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
     <!-- ── ABOUT CONTENT ─────────────────────────── -->
     <section class="about-section">
@@ -108,46 +108,47 @@ const officeBearers = [
 
   body {
     background: var(--bg-page);
-    font-family: var(--font-body);   /* inherits per-language font from global.css */
+    font-family: var(
+      --font-body
+    ); /* inherits per-language font from global.css */
   }
 
   /* ── HEADER ────────────────────────────────── */
-.page-wrap {
-  padding: 0 16px;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
-}
+  .page-wrap {
+    padding: 0 16px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+  }
 
-.page-header {
-  background: var(--text-primary);
-  border-radius: 12px;
-  padding: 28px 32px;
-  margin: 6rem 0 1.5rem;
-}
+  .page-header {
+    background: var(--text-primary);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin: 6rem 0 1.5rem;
+  }
 
-.page-title {
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--red);
-  margin-bottom: 4px;
-}
+  .page-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--red);
+    margin-bottom: 4px;
+  }
 
-.page-sub {
-  font-size: 13px;
-  color: var(--text-muted);
-}
+  .page-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
 
   /* ── ABOUT SECTION ─────────────────────────────── */
-.about-section {
-  padding: 20px 32px 20px;
-  background: var(--bg-page-alt);
-  margin-top: 0;
-}
+  .about-section {
+    padding: 20px 32px 20px;
+    background: var(--bg-page-alt);
+    margin-top: 0;
+  }
 
   .section-wrap {
-    
-  padding: 0 16px;
+    padding: 0 16px;
     max-width: 1400px;
     margin: 0 auto;
   }
@@ -247,6 +248,23 @@ const officeBearers = [
 
   /* ── MOBILE ────────────────────────────────────── */
   @media (max-width: 768px) {
+    .page-wrap {
+      max-width: 100%;
+      padding: 1rem 1rem;
+    }
+
+    .page-header {
+      padding: 20px 16px;
+      margin: 4rem 0 1.5rem;
+    }
+
+    .page-title {
+      font-size: 22px;
+    }
+
+    .page-sub {
+      font-size: 13px;
+    }
     .about-section,
     .office-bearers {
       padding: 16px 20px;
@@ -284,6 +302,15 @@ const officeBearers = [
   }
 
   @media (max-width: 480px) {
+    .page-wrap {
+      max-width: 100%;
+      padding: 0rem 1rem;
+    }
+
+    .page-header {
+      padding: 20px;
+      margin: 4.5rem 0 1.5rem;
+    }
     .bearers-grid {
       grid-template-columns: 1fr;
       max-width: 200px;

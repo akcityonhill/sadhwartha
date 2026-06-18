@@ -29,9 +29,7 @@ const contactInfo = {
     <div class="page-wrap">
       <div class="page-header">
         <div class="page-title">Contact Us</div>
-        <div class="page-sub">
-          Get in touch with Sadhwartha. 
-        </div>
+        <div class="page-sub">Get in touch with Sadhwartha.</div>
       </div>
     </div>
 
@@ -254,7 +252,7 @@ const contactInfo = {
 
   /* ── HEADER SECTION ──────────────────────────────────── */
   .page-wrap {
-  padding: 0 16px;
+    padding: 0 16px;
     max-width: 1400px;
     margin: 0 auto;
     width: 100%;
@@ -286,8 +284,7 @@ const contactInfo = {
   }
 
   .contact-container {
-    
-  padding: 0 16px;
+    padding: 0 16px;
     max-width: 1400px;
     margin: 0 auto;
     display: grid;
@@ -560,16 +557,22 @@ const contactInfo = {
   /* RESPONSIVE: TABLET (768px and below) */
   /* ──────────────────────────────────────────────────────── */
   @media (max-width: 768px) {
-    .hero {
-      padding: 80px 24px 60px;
+    .page-wrap {
+      max-width: 100%;
+      padding: 1rem 1rem;
     }
 
-    .hero-title {
-      font-size: 36px;
+    .page-header {
+      padding: 20px 16px;
+      margin: 4rem 0 1.5rem;
     }
 
-    .hero-subtitle {
-      font-size: 16px;
+    .page-title {
+      font-size: 22px;
+    }
+
+    .page-sub {
+      font-size: 13px;
     }
 
     .contact-section {
@@ -599,16 +602,14 @@ const contactInfo = {
   }
 
   @media (max-width: 480px) {
-    .hero {
-      padding: 60px 16px 40px;
+    .page-wrap {
+      max-width: 100%;
+      padding: 0rem 1rem;
     }
 
-    .hero-title {
-      font-size: 28px;
-    }
-
-    .hero-subtitle {
-      font-size: 14px;
+    .page-header {
+      padding: 20px;
+      margin: 4.5rem 0 1.5rem;
     }
 
     .contact-section {
