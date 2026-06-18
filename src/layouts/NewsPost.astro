@@ -98,7 +98,7 @@ const pageUrl = Astro.site
         <div class="title-row">
           <h1 class="article-title">{title}</h1>
 
-          <!-- <div
+          <div
             class={`author-card ${authorImage ? "with-image" : "text-only"}`}
           >
             {
@@ -111,7 +111,7 @@ const pageUrl = Astro.site
               <div class="author-name">{author}</div>
               {designation ? <div class="author-designation">{designation}</div> : null}
             </div>
-          </div> -->
+          </div>
         </div>
         <div class="date-row">
           <time datetime={pubDate.toISOString()}>{formattedDate}</time>
