@@ -3,7 +3,7 @@
 // all pages through the use of the <BaseHead /> component.
 import "../styles/global.css";
 import type { ImageMetadata } from "astro";
-import { SITE_TITLE } from "../consts";
+import { SITE_TITLE, SITE_OG_LOGO } from "../consts";
 
 interface Props {
   title: string;
@@ -11,13 +11,9 @@ interface Props {
   image?: ImageMetadata | string;
 }
 
-// Logo lives in /public, so it's referenced as a plain string path
-// (not imported via astro:assets, which only processes files in src/).
-const LOGO_PATH = "/sadhwartha_logo.png";
-
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-const { title, description, image = LOGO_PATH } = Astro.props;
+const { title, description, image = SITE_OG_LOGO } = Astro.props;
 
 // Resolve the image whether it's a processed asset (ImageMetadata, e.g. for
 // blog posts) or a plain public path (like our logo).
@@ -28,8 +24,8 @@ const imageURL = new URL(imageSrc, Astro.url);
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<link rel="icon" type="image/png" href={LOGO_PATH} />
-<link rel="apple-touch-icon" href={LOGO_PATH} />
+<link rel="icon" type="image/png" href={SITE_OG_LOGO} />
+<link rel="apple-touch-icon" href={SITE_OG_LOGO} />
 <link rel="sitemap" href="/sitemap-index.xml" />
 <link
   rel="alternate"

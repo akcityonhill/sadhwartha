@@ -4,7 +4,7 @@ import Navbar from "../../components/Navbar.astro";
 import Footer from "../../components/Footer.astro";
 import ArticlesByLanguageSidebar from "../../components/ArticlesByLanguageSidebar.astro";
 import NewsByLanguageSidebar from "../../components/NewsByLanguageSidebar.astro";
-import { SITE_TITLE } from "../../consts";
+import { SITE_TITLE, SITE_OG_LOGO } from "../../consts";
 import { getCollection } from "astro:content";
 
 const allArticles = await getCollection("blog");
@@ -40,6 +40,7 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
     <BaseHead
       title={`Articles | ${SITE_TITLE}`}
       description="All Sadhwartha articles"
+      image={SITE_OG_LOGO}
     />
   </head>
   <body>
