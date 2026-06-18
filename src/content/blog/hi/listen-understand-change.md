@@ -4,7 +4,7 @@ description: ""
 author: पास्टर एम. पी. गौतम
 designation: Evangelism Director, COG CWR
 authorImage: ../../../../public/uploads/blog/hi/listen-understand-change/author.png
-pubDate: 2026-06-02
+pubDate: 2026-06-13
 language: hi
 heroImage: ../../../../public/uploads/blog/hi/listen-understand-change/hero.png
 translations:

@@ -4,7 +4,7 @@ description: ""
 author: "Pr. E. P. Samkutty"
 designation: "Overseer, CGI CWR"
 authorImage: "../../../../public/uploads/blog/ml/the-believer-and-the-influences-of-the-world/author.png"
-pubDate: 2026-06-02
+pubDate: 2026-06-14
 language: ml
 heroImage: ../../../../public/uploads/blog/ml/the-believer-and-the-influences-of-the-world/hero.png
 translations:
