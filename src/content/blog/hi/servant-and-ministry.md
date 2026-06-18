@@ -3,7 +3,7 @@ title: सेवक और सेवकाई
 description: मसीही सेवकों के लिए मार्गदर्शन और प्रोत्साहन
 author: डॉ. शिबू थॉमस
 designation: ""
-authorImage: ""
+authorImage: ../../../../public/uploads/blog/hi/servant-and-ministry/author.jpeg
 pubDate: 2026-06-02
 language: hi
 heroImage: ../../../../public/uploads/blog/hi/servant-and-ministry/hero.png

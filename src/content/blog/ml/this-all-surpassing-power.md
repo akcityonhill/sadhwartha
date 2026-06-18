@@ -3,7 +3,7 @@ title: ഈ അത്യന്തശക്തി
 description: ""
 author: Pr. M. A. Ninan
 designation: ""
-authorImage: ""
+authorImage: ../../../../public/uploads/blog/ml/this-all-surpassing-power/author.jpeg
 pubDate: 2026-06-02
 language: ml
 heroImage: ../../../../public/uploads/blog/ml/this-all-surpassing-power/hero.png
