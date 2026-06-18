@@ -36,6 +36,15 @@ const officeBearers = [
   <body>
     <Navbar />
 
+    <div class="page-wrap">
+  <div class="page-header">
+    <div class="page-title">About Sadhwartha</div>
+    <div class="page-sub">
+      Learn about Sadhwartha and meet the leadership of the publication.
+    </div>
+  </div>
+</div>
+
     <!-- ── ABOUT CONTENT ─────────────────────────── -->
     <section class="about-section">
       <div class="section-wrap">
@@ -102,16 +111,44 @@ const officeBearers = [
     font-family: var(--font-body);   /* inherits per-language font from global.css */
   }
 
-  /* ── ABOUT HERO ────────────────────────────────── */
+  /* ── HEADER ────────────────────────────────── */
+.page-wrap {
+  padding: 0 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.page-header {
+  background: var(--text-primary);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin: 6rem 0 1.5rem;
+}
+
+.page-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--red);
+  margin-bottom: 4px;
+}
+
+.page-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
   /* ── ABOUT SECTION ─────────────────────────────── */
-  .about-section {
-    padding: 40px 32px 20px;
-    background: var(--bg-page-alt);
-    margin-top: var(--navbar-height);
-  }
+.about-section {
+  padding: 20px 32px 20px;
+  background: var(--bg-page-alt);
+  margin-top: 0;
+}
 
   .section-wrap {
-    max-width: 900px;
+    
+  padding: 0 16px;
+    max-width: 1400px;
     margin: 0 auto;
   }
 
