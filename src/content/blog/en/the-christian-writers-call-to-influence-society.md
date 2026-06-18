@@ -1,5 +1,5 @@
 ---
-title: The Christian Writers' Call to Influence Society
+title: The Christian Writers' Call to Influence Society - Editorial
 description: Editorial (April - May 2026)
 author: Pr. Manu K. Chacko
 designation: Chief Editor
