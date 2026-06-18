@@ -124,6 +124,9 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
                             <div class="article-desc">
                               {article.data.description}
                             </div>
+                            <div class="article-author">
+                              {article.data.author}
+                            </div>
                           </div>
                         </a>
                         {lang !== "en" && enUrl && (
@@ -353,6 +356,12 @@ const activeLangs = langOrder.filter((l) => grouped[l]?.length > 0);
   }
 
   .article-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  
+  .article-author {
     font-size: 13px;
     color: var(--text-secondary);
     line-height: 1.5;
