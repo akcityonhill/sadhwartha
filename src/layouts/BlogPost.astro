@@ -3,7 +3,7 @@ import type { CollectionEntry } from "astro:content";
 import BaseHead from "../components/BaseHead.astro";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
-import { SITE_TITLE } from "../consts";
+import { SITE_TITLE, SITE_OG_LOGO } from "../consts";
 
 const {
   title,
@@ -66,7 +66,7 @@ const pageUrl = Astro.site
     <BaseHead
       title={`${title} | ${SITE_TITLE}`}
       description={description}
-      image={heroImage?.src}
+      image={SITE_OG_LOGO}
     />
     <!-- hreflang tags for multilingual SEO -->
     {

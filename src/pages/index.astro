@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
 import ArticlesByLanguageSidebar from "../components/ArticlesByLanguageSidebar.astro";
 import NewsByLanguageSidebar from "../components/NewsByLanguageSidebar.astro";
-import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import { SITE_TITLE, SITE_DESCRIPTION, SITE_OG_LOGO } from "../consts";
 import { getCollection } from "astro:content";
 
 const allArticles = await getCollection("blog");
@@ -52,7 +52,11 @@ const LANG_LABELS: Record<string, string> = {
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <BaseHead
+      title={SITE_TITLE}
+      description={SITE_DESCRIPTION}
+      image={SITE_OG_LOGO}
+    />
   </head>
 
   <body>
