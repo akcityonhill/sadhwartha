@@ -31,8 +31,8 @@
   --nav-link-color: #0f172a;
   --hamburger-color: #475569;
   --mobile-menu-bg: #ffffff;
-  --red-hover-light: rgba(214, 40, 40, 0.1);
-  --red-hover-lighter: rgba(214, 40, 40, 0.15);
+  --red-hover-light: rgba(214, 170, 40, 0.1);
+  --red-hover-lighter: rgba(214, 170, 40, 0.1);
 }
 
 * {
